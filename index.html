@@ -521,9 +521,12 @@ function buildGrid(pidx){
   var grid=document.getElementById(gridId);
   grid.innerHTML='';
 
+  // ボット枠はcommon/uncommon/rareのみ（プレイヤーは全レア度）
+  var BOT_ALLOWED_RARITIES=['common','uncommon','rare'];
   CHARACTERS.forEach(function(c){
     var items=ownedData[c.id]||[];
     if(!items.length)return;
+    if(pidx===0&&BOT_ALLOWED_RARITIES.indexOf(c.rarity)<0)return;
 
     // 変異なしのアイテムをまとめる
     var noMutItems=items.filter(function(it){return !it.muts||it.muts.length===0;});
