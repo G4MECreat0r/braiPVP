@@ -15,8 +15,6 @@
 body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans-serif;overflow:hidden;height:100dvh;width:100vw;display:flex;flex-direction:column;align-items:center;justify-content:center}
 #screen-select,#screen-game{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
 #screen-game{display:none}
-
-/* ── SELECT ── */
 .title{font-family:'Zen Dots',sans-serif;font-size:clamp(14px,3.5vw,24px);color:var(--accent3);text-align:center;margin-bottom:2px}
 .subtitle{font-size:10px;color:var(--muted);text-align:center;margin-bottom:10px}
 .vs-row{display:flex;gap:8px;align-items:flex-start;justify-content:center;width:100%;max-width:500px;padding:0 8px}
@@ -43,8 +41,6 @@ body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans
 .start-btn{margin-top:10px;background:linear-gradient(135deg,var(--accent),#cc0044);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-size:14px;font-weight:900;cursor:pointer;font-family:'M PLUS Rounded 1c',sans-serif;transition:.2s}
 .start-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
 .note{font-size:9px;color:var(--muted);text-align:center;margin-top:5px;max-width:360px;line-height:1.4}
-
-/* ── GAME ── */
 canvas{display:block;border-radius:8px;touch-action:none}
 .game-ui{width:100%;max-width:680px;padding:3px 6px 2px;flex-shrink:0}
 .hp-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
@@ -60,28 +56,20 @@ canvas{display:block;border-radius:8px;touch-action:none}
 .carry-bar-bg{height:8px;border-radius:4px;background:#1a1a35;border:1px solid var(--border);overflow:hidden;margin-bottom:2px}
 .carry-bar-fill{height:100%;border-radius:4px;background:var(--accent3);transition:width .1s}
 .carry-label{font-size:8px;color:var(--muted);text-align:center}
-
-/* コレクター連携ノート */
-#collector-note{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:1.5px solid var(--accent2);border-radius:10px;padding:7px 16px;font-size:11px;font-weight:700;color:var(--accent2);z-index:999;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;}
-
-/* mobile buttons */
+#collector-note{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.88);border:1.5px solid var(--accent2);border-radius:10px;padding:7px 16px;font-size:11px;font-weight:700;color:var(--accent2);z-index:999;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap}
 .mobile-btns{display:flex;justify-content:flex-end;padding:3px 6px 0;gap:4px;width:100%;max-width:680px;flex-shrink:0}
 .mb-group{display:flex;gap:3px;align-items:center}
 .mb-btn{background:var(--card);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:11px;font-weight:900;width:44px;height:44px;display:flex;align-items:center;justify-content:center;user-select:none;touch-action:none;cursor:pointer}
 .mb-attack{background:#ff336633;border-color:var(--accent);color:var(--accent);font-size:15px}
 .back-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:4px 10px;font-size:9px;cursor:pointer;font-family:'M PLUS Rounded 1c',sans-serif}
 .back-btn:hover{color:var(--text);border-color:var(--accent2)}
-
 .r-common{color:#8888aa}.r-uncommon{color:#44cc44}.r-rare{color:#4488ff}
 .r-epic{color:#cc44ff}.r-legendary{color:#ffaa00}
 .r-mythic,.r-supermythic,.r-secret,.r-divine{color:#ff3366}
 </style>
 </head>
 <body>
-
 <div id="collector-note"></div>
-
-<!-- SELECT SCREEN -->
 <div id="screen-select">
   <div class="title">🥊 BRAINROT FIGHTER</div>
   <div class="subtitle">キャラを選んで戦え！ボットから敵キャラを奪え！</div>
@@ -104,20 +92,12 @@ canvas{display:block;border-radius:8px;touch-action:none}
   <button class="start-btn" id="start-btn" disabled>キャラを選んで開始！</button>
   <div class="note" id="save-note"></div>
 </div>
-
-<!-- GAME SCREEN -->
 <div id="screen-game">
   <div class="game-ui">
     <div class="hp-row">
-      <div class="hp-wrap">
-        <div class="hp-label" id="p1-hp-label">🤖 ボット</div>
-        <div class="hp-bg"><div class="hp-fill hp-enemy" id="hp1-bar" style="width:100%"></div></div>
-      </div>
+      <div class="hp-label" id="p1-hp-label" style="flex:1;font-size:10px;color:var(--muted)">🤖 ボット</div>
       <div class="center-score" id="score-text">0 - 0</div>
-      <div class="hp-wrap">
-        <div class="hp-label" style="text-align:right" id="p2-hp-label">あなた 🎮</div>
-        <div class="hp-bg"><div class="hp-fill hp-player" id="hp2-bar" style="width:100%;float:right"></div></div>
-      </div>
+      <div class="hp-label" id="p2-hp-label" style="flex:1;text-align:right;font-size:10px;color:var(--muted)">あなた 🎮</div>
     </div>
   </div>
   <div id="msg">🥊 ファイト！</div>
@@ -126,25 +106,248 @@ canvas{display:block;border-radius:8px;touch-action:none}
     <div class="carry-bar-bg"><div class="carry-bar-fill" id="carry-bar" style="width:0%"></div></div>
     <div class="carry-label" id="carry-label">キャラを運んでいる…</div>
   </div>
-  <div class="mobile-btns">
-    <div class="mb-group">
-      <button class="back-btn" id="back-btn">↩</button>
-      <button class="mb-btn" id="btn-l">◀</button>
-      <button class="mb-btn" id="btn-u">▲</button>
-      <button class="mb-btn" id="btn-r">▶</button>
-      <button class="mb-btn mb-attack" id="btn-a">👊</button>
+  <div class="mobile-btns" style="justify-content:space-between;align-items:flex-end;padding:4px 14px 8px;">
+    <div style="display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px;gap:3px;">
+      <div></div>
+      <button class="mb-btn" id="btn-u" style="grid-column:2;grid-row:1;">▲</button>
+      <div></div>
+      <button class="mb-btn" id="btn-l" style="grid-column:1;grid-row:2;">◀</button>
+      <button class="back-btn" id="back-btn" style="grid-column:2;grid-row:2;width:44px;height:44px;font-size:14px;padding:0;border-radius:9px;display:flex;align-items:center;justify-content:center;">↩</button>
+      <button class="mb-btn" id="btn-r" style="grid-column:3;grid-row:2;">▶</button>
     </div>
+    <button class="mb-btn mb-attack" id="btn-a" style="width:64px;height:64px;font-size:24px;border-radius:50%;align-self:center;">👊</button>
   </div>
 </div>
-
 <script>
-// ★ SVGS と CHARACTERS はコレクター(index.html)と同じものをここに貼り付けてください
-// 例: const SVGS = { tralalero: `<svg...>`, ... };
-// 例: const CHARACTERS = [ {id:'tralalero', name:'トラ・ラ・レロ', rarity:'common', rate:5, desc:'...'}, ... ];
-// ↓ 以下は動作確認用のミニマルサンプル（本番では全キャラに差し替え）
-const SVGS = {};
-const CHARACTERS = [];
-// ★ここまでを差し替え
+const SVGS={
+tralalero:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="34" rx="14" ry="16" fill="#1a6ae0"/><circle cx="30" cy="18" r="10" fill="#f5c5a3"/><rect x="18" y="10" width="24" height="6" rx="2" fill="#cc2200"/><ellipse cx="30" cy="10" rx="12" ry="3" fill="#ee3300"/><circle cx="25" cy="18" r="2.5" fill="#fff"/><circle cx="25.7" cy="18.5" r="1.2" fill="#000"/><circle cx="35" cy="18" r="2.5" fill="#fff"/><circle cx="35.7" cy="18.5" r="1.2" fill="#000"/><path d="M26,23 Q30,26 34,23" stroke="#000" stroke-width="1.2" fill="none"/><rect x="14" y="26" width="6" height="12" rx="2" fill="#e0e0e0"/><rect x="40" y="26" width="6" height="12" rx="2" fill="#e0e0e0"/><rect x="22" y="50" width="5" height="8" rx="2" fill="#e0e0e0"/><rect x="33" y="50" width="5" height="8" rx="2" fill="#e0e0e0"/></svg>`,
+bombardino:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="15" ry="14" fill="#4a8a30"/><circle cx="30" cy="20" r="11" fill="#5aaa40"/><path d="M20,26 Q30,32 40,26" fill="#3a7a20"/><ellipse cx="22" cy="18" rx="4" ry="5" fill="#3a7a20"/><ellipse cx="38" cy="18" rx="4" ry="5" fill="#3a7a20"/><circle cx="25" cy="19" r="3" fill="#fff"/><circle cx="26" cy="19.5" r="1.5" fill="#000"/><circle cx="35" cy="19" r="3" fill="#fff"/><circle cx="36" cy="19.5" r="1.5" fill="#000"/><ellipse cx="30" cy="25" rx="5" ry="3" fill="#2a6a10"/><rect x="18" y="46" width="7" height="3" rx="1" fill="#cc9900"/><rect x="35" y="46" width="7" height="3" rx="1" fill="#cc9900"/></svg>`,
+chimpanzini:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="38" rx="13" ry="12" fill="#6a4020"/><circle cx="30" cy="22" r="11" fill="#7a5030"/><ellipse cx="20" cy="20" rx="5" ry="6" fill="#6a4020"/><ellipse cx="40" cy="20" rx="5" ry="6" fill="#6a4020"/><ellipse cx="30" cy="26" rx="7" ry="5" fill="#c08060"/><circle cx="25" cy="20" r="3" fill="#fff"/><circle cx="25.8" cy="20.5" r="1.4" fill="#1a0a00"/><circle cx="35" cy="20" r="3" fill="#fff"/><circle cx="35.8" cy="20.5" r="1.4" fill="#1a0a00"/><rect x="16" y="30" width="5" height="16" rx="2.5" fill="#6a4020"/><rect x="39" y="30" width="5" height="16" rx="2.5" fill="#6a4020"/></svg>`,
+crocodilus:`<svg viewBox="0 0 60 60"><rect x="10" y="28" width="40" height="12" rx="4" fill="#2a8a20"/><ellipse cx="45" cy="34" rx="8" ry="5" fill="#3aaa30"/><rect x="38" y="24" width="16" height="6" rx="2" fill="#2a8a20"/><circle cx="48" cy="22" r="3" fill="#fff"/><circle cx="48.5" cy="22.5" r="1.5" fill="#000"/><circle cx="54" cy="22" r="3" fill="#fff"/><circle cx="54.5" cy="22.5" r="1.5" fill="#000"/><path d="M38,30 L42,24 L44,30 L48,24 L50,30" stroke="#1a6a10" stroke-width="1.5" fill="none"/><rect x="14" y="40" width="5" height="10" rx="2" fill="#1a8a10"/><rect x="22" y="40" width="5" height="10" rx="2" fill="#1a8a10"/><rect x="33" y="40" width="5" height="10" rx="2" fill="#1a8a10"/><rect x="41" y="40" width="5" height="10" rx="2" fill="#1a8a10"/></svg>`,
+cappuccino:`<svg viewBox="0 0 60 60"><rect x="15" y="25" width="30" height="28" rx="4" fill="#8B4513"/><ellipse cx="30" cy="25" rx="15" ry="6" fill="#d2691e"/><ellipse cx="30" cy="22" rx="12" ry="5" fill="#ffe0b0"/><circle cx="23" cy="20" r="4" fill="#fff9f0"/><circle cx="30" cy="18" r="5" fill="#fff9f0"/><circle cx="37" cy="20" r="4" fill="#fff9f0"/><circle cx="24" cy="22" r="2" fill="#fff"/><circle cx="24.5" cy="22.5" r="1" fill="#000"/><circle cx="36" cy="22" r="2" fill="#fff"/><circle cx="36.5" cy="22.5" r="1" fill="#000"/><path d="M25,28 Q30,32 35,28" stroke="#5a2d0c" stroke-width="1.2" fill="none"/><rect x="45" y="32" width="8" height="4" rx="2" fill="#8B4513"/></svg>`,
+bananaio:`<svg viewBox="0 0 60 60"><path d="M10,50 Q12,24 30,14 Q48,24 50,50 Q40,46 30,48 Q20,46 10,50Z" fill="#ffdd00"/><circle cx="24" cy="30" r="3.5" fill="#fff"/><circle cx="25" cy="30.8" r="1.7" fill="#000"/><circle cx="36" cy="30" r="3.5" fill="#fff"/><circle cx="37" cy="30.8" r="1.7" fill="#000"/><path d="M25,38 Q30,42 35,38" stroke="#cc8800" stroke-width="1.5" fill="none"/><ellipse cx="30" cy="14" rx="5" ry="3" fill="#44aa00"/></svg>`,
+octodino:`<svg viewBox="0 0 60 60"><circle cx="30" cy="26" r="16" fill="#2244aa"/><path d="M14,36 Q10,50 16,54 Q18,44 20,42 Q18,52 24,56 Q24,46 26,44 Q26,54 30,56 Q34,54 34,44 Q36,46 36,56 Q42,52 40,42 Q42,44 44,54 Q50,50 46,36" fill="#2244aa"/><circle cx="24" cy="22" r="3.5" fill="#fff"/><circle cx="25" cy="22.8" r="1.7" fill="#000"/><circle cx="36" cy="22" r="3.5" fill="#fff"/><circle cx="37" cy="22.8" r="1.7" fill="#000"/><path d="M25,30 Q30,34 35,30" stroke="#aaccff" stroke-width="1.5" fill="none"/></svg>`,
+spaghetto:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="42" rx="20" ry="14" fill="#ffcc88"/><path d="M10,38 Q15,30 20,38 Q25,30 30,38 Q35,30 40,38 Q45,30 50,38" stroke="#cc6600" stroke-width="2.5" fill="none"/><circle cx="30" cy="24" r="10" fill="#f5c5a3"/><circle cx="26" cy="22" r="2" fill="#fff"/><circle cx="26.7" cy="22.5" r="1" fill="#000"/><circle cx="34" cy="22" r="2" fill="#fff"/><circle cx="34.7" cy="22.5" r="1" fill="#000"/><path d="M27,28 Q30,31 33,28" stroke="#aa4400" stroke-width="1" fill="none"/></svg>`,
+derpfish:`<svg viewBox="0 0 60 60"><ellipse cx="28" cy="32" rx="20" ry="15" fill="#44aacc"/><polygon points="48,32 58,22 58,42" fill="#33aacc"/><polygon points="10,20 2,16 8,28" fill="#33aacc"/><polygon points="10,44 2,48 8,36" fill="#33aacc"/><circle cx="20" cy="28" r="5" fill="#fff"/><circle cx="21.5" cy="28.5" r="2.5" fill="#000"/><ellipse cx="32" cy="36" rx="5" ry="3" fill="#2288aa"/></svg>`,
+snailzord:`<svg viewBox="0 0 60 60"><ellipse cx="22" cy="42" rx="18" ry="10" fill="#8B6914"/><path d="M4,40 Q6,26 16,30 Q14,18 22,22 Q20,10 30,16 Q40,10 42,20 Q50,18 48,30 Q54,34 50,42" fill="#cc9933"/><circle cx="26" cy="24" r="6" fill="#cc9933"/><circle cx="26" cy="24" r="4" fill="#eebb44"/><circle cx="18" cy="36" r="3" fill="#fff"/><circle cx="18.7" cy="36.5" r="1.5" fill="#000"/></svg>`,
+frigo:`<svg viewBox="0 0 60 60"><rect x="12" y="10" width="36" height="44" rx="5" fill="#aaddff"/><rect x="12" y="10" width="36" height="20" rx="5" fill="#88ccff"/><rect x="14" y="12" width="32" height="16" rx="3" fill="#cceeff"/><rect x="14" y="32" width="32" height="20" rx="3" fill="#ddeeff"/><rect x="42" y="20" width="4" height="6" rx="1" fill="#6699cc"/><rect x="42" y="35" width="4" height="6" rx="1" fill="#6699cc"/><circle cx="23" cy="22" r="3" fill="#fff"/><circle cx="23.7" cy="22.5" r="1.5" fill="#0055aa"/><circle cx="37" cy="22" r="3" fill="#fff"/><circle cx="37.7" cy="22.5" r="1.5" fill="#0055aa"/><path d="M24,28 Q30,32 36,28" stroke="#0066bb" stroke-width="1.2" fill="none"/></svg>`,
+boiboiboi:`<svg viewBox="0 0 60 60"><rect x="16" y="28" width="28" height="24" rx="4" fill="#ff8800"/><circle cx="30" cy="20" r="12" fill="#ffaa44"/><rect x="18" y="10" width="24" height="10" rx="3" fill="#cc5500"/><circle cx="24" cy="20" r="3" fill="#fff"/><circle cx="24.8" cy="20.5" r="1.5" fill="#000"/><circle cx="36" cy="20" r="3" fill="#fff"/><circle cx="36.8" cy="20.5" r="1.5" fill="#000"/><rect x="12" y="30" width="6" height="14" rx="3" fill="#ff8800"/><rect x="42" y="30" width="6" height="14" rx="3" fill="#ff8800"/></svg>`,
+glorbo:`<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="#8822dd"/><circle cx="30" cy="30" r="15" fill="#aa44ff"/><circle cx="23" cy="26" r="4" fill="#fff"/><circle cx="24" cy="26.8" r="2" fill="#4400aa"/><circle cx="37" cy="26" r="4" fill="#fff"/><circle cx="38" cy="26.8" r="2" fill="#4400aa"/><path d="M24,34 Q30,38 36,34" stroke="#4400aa" stroke-width="1.5" fill="none"/><circle cx="16" cy="16" r="4" fill="#cc33ff" opacity=".7"/><circle cx="44" cy="14" r="3" fill="#cc33ff" opacity=".7"/></svg>`,
+skibidi:`<svg viewBox="0 0 60 60"><rect x="18" y="30" width="24" height="22" rx="4" fill="#444"/><rect x="16" y="26" width="28" height="8" rx="3" fill="#333"/><circle cx="30" cy="20" r="12" fill="#f5c5a3"/><rect x="22" y="10" width="16" height="8" rx="2" fill="#222"/><circle cx="25" cy="20" r="2.5" fill="#fff"/><circle cx="25.7" cy="20.5" r="1.2" fill="#000"/><circle cx="35" cy="20" r="2.5" fill="#fff"/><circle cx="35.7" cy="20.5" r="1.2" fill="#000"/></svg>`,
+mutanimals:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="38" rx="16" ry="14" fill="#4a8a20"/><circle cx="30" cy="22" r="12" fill="#5aaa30"/><polygon points="20,14 16,6 24,12" fill="#3a7a10"/><polygon points="40,14 44,6 36,12" fill="#3a7a10"/><circle cx="25" cy="20" r="3" fill="#ff0"/><circle cx="25.8" cy="20.8" r="1.4" fill="#000"/><circle cx="35" cy="20" r="3" fill="#ff0"/><circle cx="35.8" cy="20.8" r="1.4" fill="#000"/></svg>`,
+gloopii:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="34" rx="20" ry="22" fill="#44ddaa"/><ellipse cx="30" cy="24" rx="16" ry="14" fill="#66ffcc"/><circle cx="24" cy="22" r="4" fill="#fff"/><circle cx="25" cy="23" r="2" fill="#005533"/><circle cx="36" cy="22" r="4" fill="#fff"/><circle cx="37" cy="23" r="2" fill="#005533"/><path d="M25,30 Q30,34 35,30" stroke="#22aa88" stroke-width="1.5" fill="none"/></svg>`,
+thunderpig:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="38" rx="18" ry="14" fill="#ffaacc"/><circle cx="30" cy="22" r="14" fill="#ffbbcc"/><ellipse cx="22" cy="18" rx="5" ry="6" fill="#ffaacc"/><ellipse cx="38" cy="18" rx="5" ry="6" fill="#ffaacc"/><circle cx="25" cy="20" r="3" fill="#fff"/><circle cx="25.8" cy="20.7" r="1.5" fill="#000"/><circle cx="35" cy="20" r="3" fill="#fff"/><circle cx="35.8" cy="20.7" r="1.5" fill="#000"/><path d="M22,36 L26,28 L24,30 L28,20 L26,24 L32,12" stroke="#ffdd00" stroke-width="2" fill="none"/></svg>`,
+spookster:`<svg viewBox="0 0 60 60"><path d="M14,60 Q14,30 30,14 Q46,30 46,60 Q40,54 36,60 Q32,54 30,60 Q28,54 24,60 Q20,54 14,60Z" fill="#e0e0ff" opacity=".9"/><circle cx="23" cy="30" r="5" fill="#000"/><circle cx="37" cy="30" r="5" fill="#000"/><circle cx="24" cy="29" r="2" fill="#fff"/><circle cx="38" cy="29" r="2" fill="#fff"/></svg>`,
+noodleface:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="18" ry="20" fill="#ffe4aa"/><path d="M12,30 Q14,20 18,24 Q16,14 22,18 Q20,8 28,14 Q26,6 32,10 Q30,4 36,10 Q38,6 42,12" stroke="#cc8800" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="24" cy="30" r="3.5" fill="#fff"/><circle cx="25" cy="30.8" r="1.8" fill="#000"/><circle cx="36" cy="30" r="3.5" fill="#fff"/><circle cx="37" cy="30.8" r="1.8" fill="#000"/></svg>`,
+pizzaface:`<svg viewBox="0 0 60 60"><polygon points="30,4 6,52 54,52" fill="#e8a030"/><polygon points="30,10 10,48 50,48" fill="#cc3300"/><circle cx="24" cy="36" r="3" fill="#fff"/><circle cx="24.8" cy="36.8" r="1.5" fill="#000"/><circle cx="36" cy="36" r="3" fill="#fff"/><circle cx="36.8" cy="36.8" r="1.5" fill="#000"/><path d="M26,44 Q30,48 34,44" stroke="#000" stroke-width="1.2" fill="none"/></svg>`,
+hotdogman:`<svg viewBox="0 0 60 60"><rect x="10" y="20" width="40" height="30" rx="15" fill="#c87040"/><rect x="12" y="26" width="36" height="18" rx="8" fill="#e8c080"/><path d="M14,30 Q20,24 26,30 Q32,24 38,30 Q44,24 48,30" stroke="#ffdd00" stroke-width="2" fill="none"/><circle cx="23" cy="34" r="3" fill="#fff"/><circle cx="23.7" cy="34.5" r="1.4" fill="#000"/><circle cx="37" cy="34" r="3" fill="#fff"/><circle cx="37.7" cy="34.5" r="1.4" fill="#000"/></svg>`,
+cheeseborg:`<svg viewBox="0 0 60 60"><rect x="10" y="28" width="40" height="26" rx="4" fill="#c8b010"/><polygon points="10,28 30,8 50,28" fill="#f0d830"/><circle cx="20" cy="22" r="3" fill="#ffe070"/><circle cx="30" cy="18" r="3" fill="#ffe070"/><circle cx="40" cy="22" r="3" fill="#ffe070"/><circle cx="22" cy="36" r="4" fill="#fff"/><circle cx="23" cy="37" r="2" fill="#000"/><circle cx="38" cy="36" r="4" fill="#fff"/><circle cx="39" cy="37" r="2" fill="#000"/></svg>`,
+lavadrill:`<svg viewBox="0 0 60 60"><circle cx="30" cy="28" r="18" fill="#cc4400"/><circle cx="30" cy="28" r="13" fill="#ee6600"/><polygon points="30,6 34,24 30,18 26,24" fill="#ffaa00"/><circle cx="24" cy="30" r="3" fill="#fff"/><circle cx="24.8" cy="30.5" r="1.5" fill="#000"/><circle cx="36" cy="30" r="3" fill="#fff"/><circle cx="36.8" cy="30.5" r="1.5" fill="#000"/><ellipse cx="20" cy="48" rx="3" ry="5" fill="#ff4400"/><ellipse cx="30" cy="50" rx="3" ry="5" fill="#ff6600"/><ellipse cx="40" cy="48" rx="3" ry="5" fill="#ff4400"/></svg>`,
+jacko:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="18" ry="18" fill="#e87020"/><polygon points="19,28 23,22 23,30" fill="#000"/><polygon points="41,28 37,22 37,30" fill="#000"/><path d="M19,37 L22,40 L25,37 L28,40 L30,37 L32,40 L35,37 L38,40 L41,37" stroke="#000" stroke-width="1.5" fill="none"/><rect x="26" y="14" width="8" height="8" rx="2" fill="#2a6a10"/></svg>`,
+cameraman:`<svg viewBox="0 0 60 60"><rect x="12" y="22" width="36" height="26" rx="5" fill="#222"/><circle cx="30" cy="35" r="10" fill="#111"/><circle cx="30" cy="35" r="7" fill="#1a2a4a"/><circle cx="30" cy="35" r="4.5" fill="#0a1a3a"/><rect x="36" y="24" width="6" height="5" rx="1.5" fill="#ffee00"/><rect x="12" y="15" width="14" height="9" rx="2" fill="#222"/></svg>`,
+robotello:`<svg viewBox="0 0 60 60"><rect x="14" y="24" width="32" height="28" rx="4" fill="#445566"/><rect x="16" y="10" width="28" height="16" rx="4" fill="#445566"/><circle cx="25" cy="18" r="4" fill="#00ffcc"/><circle cx="25.8" cy="18.5" r="2" fill="#004433"/><circle cx="35" cy="18" r="4" fill="#00ffcc"/><circle cx="35.8" cy="18.5" r="2" fill="#004433"/><rect x="24" y="34" width="12" height="3" rx="1" fill="#00cc88"/><rect x="8" y="28" width="6" height="14" rx="3" fill="#445566"/><rect x="46" y="28" width="6" height="14" rx="3" fill="#445566"/></svg>`,
+zappyboi:`<svg viewBox="0 0 60 60"><rect x="16" y="26" width="28" height="26" rx="5" fill="#1144aa"/><circle cx="30" cy="18" r="12" fill="#2255cc"/><path d="M20,8 L26,18 L22,18 L28,30 L24,30 L32,8 Z" fill="#ffdd00"/><circle cx="24" cy="19" r="3" fill="#fff"/><circle cx="25" cy="19.8" r="1.5" fill="#0022aa"/><circle cx="36" cy="19" r="3" fill="#fff"/><circle cx="37" cy="19.8" r="1.5" fill="#0022aa"/></svg>`,
+magmakong:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="18" ry="16" fill="#880000"/><circle cx="30" cy="20" r="14" fill="#aa2200"/><ellipse cx="18" cy="18" rx="7" ry="8" fill="#880000"/><ellipse cx="42" cy="18" rx="7" ry="8" fill="#880000"/><circle cx="24" cy="20" r="4" fill="#ff6600"/><circle cx="25" cy="21" r="2" fill="#000"/><circle cx="36" cy="20" r="4" fill="#ff6600"/><circle cx="37" cy="21" r="2" fill="#000"/><rect x="10" y="32" width="8" height="18" rx="4" fill="#880000"/><rect x="42" y="32" width="8" height="18" rx="4" fill="#880000"/></svg>`,
+moonrabbit:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="40" rx="14" ry="16" fill="#e8e0ff"/><circle cx="30" cy="24" r="12" fill="#f0e8ff"/><ellipse cx="22" cy="12" rx="4" ry="10" fill="#e8e0ff"/><ellipse cx="38" cy="12" rx="4" ry="10" fill="#e8e0ff"/><ellipse cx="22" cy="12" rx="2.5" ry="7" fill="#ffaabb"/><ellipse cx="38" cy="12" rx="2.5" ry="7" fill="#ffaabb"/><circle cx="25" cy="24" r="3.5" fill="#fff"/><circle cx="26" cy="24.8" r="1.8" fill="#7744aa"/><circle cx="35" cy="24" r="3.5" fill="#fff"/><circle cx="36" cy="24.8" r="1.8" fill="#7744aa"/></svg>`,
+beefnado:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="18" ry="16" fill="#884422"/><circle cx="30" cy="20" r="14" fill="#aa5533"/><polygon points="20,12 16,4 24,10" fill="#cc6600"/><polygon points="40,12 44,4 36,10" fill="#cc6600"/><circle cx="24" cy="20" r="3.5" fill="#fff"/><circle cx="25" cy="21" r="1.8" fill="#220000"/><circle cx="36" cy="20" r="3.5" fill="#fff"/><circle cx="37" cy="21" r="1.8" fill="#220000"/></svg>`,
+aquadoge:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="16" ry="14" fill="#daa520"/><circle cx="30" cy="22" r="13" fill="#f0b030"/><ellipse cx="20" cy="20" rx="5" ry="6" fill="#daa520"/><ellipse cx="40" cy="20" rx="5" ry="6" fill="#daa520"/><circle cx="25" cy="20" r="3.5" fill="#fff"/><circle cx="26" cy="21" r="1.8" fill="#000"/><circle cx="35" cy="20" r="3.5" fill="#fff"/><circle cx="36" cy="21" r="1.8" fill="#000"/></svg>`,
+turbosnake:`<svg viewBox="0 0 60 60"><path d="M6,50 Q10,36 20,32 Q30,28 36,20 Q42,12 54,14" stroke="#22aa44" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M6,50 Q10,36 20,32 Q30,28 36,20 Q42,12 54,14" stroke="#44cc66" stroke-width="6" fill="none" stroke-linecap="round"/><circle cx="54" cy="14" r="7" fill="#33bb55"/><circle cx="51" cy="11" r="2.5" fill="#fff"/><circle cx="57" cy="11" r="2.5" fill="#fff"/></svg>`,
+stormcrow:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="34" rx="14" ry="16" fill="#223344"/><path d="M10,28 Q8,14 20,22" fill="#223344"/><path d="M50,28 Q52,14 40,22" fill="#223344"/><circle cx="30" cy="18" r="12" fill="#334455"/><circle cx="24" cy="16" r="3.5" fill="#fff"/><circle cx="25" cy="17" r="1.8" fill="#1a0033"/><circle cx="36" cy="16" r="3.5" fill="#fff"/><circle cx="37" cy="17" r="1.8" fill="#1a0033"/><path d="M6,38 L14,32 L11,38 L18,33" stroke="#ffdd00" stroke-width="1.8" fill="none"/><path d="M54,38 L46,32 L49,38 L42,33" stroke="#ffdd00" stroke-width="1.8" fill="none"/></svg>`,
+sandworm:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="18" rx="16" ry="14" fill="#cc9944"/><path d="M14,28 Q10,40 14,52" stroke="#cc9944" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M30,30 Q26,42 30,54" stroke="#cc9944" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M46,28 Q50,40 46,52" stroke="#cc9944" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="24" cy="16" r="4" fill="#fff"/><circle cx="25" cy="17" r="2" fill="#440000"/><circle cx="36" cy="16" r="4" fill="#fff"/><circle cx="37" cy="17" r="2" fill="#440000"/></svg>`,
+partybandi:`<svg viewBox="0 0 60 60"><rect x="16" y="26" width="28" height="26" rx="4" fill="#2a2a2a"/><circle cx="30" cy="20" r="11" fill="#3a3a3a"/><rect x="16" y="12" width="28" height="7" rx="2" fill="#cc3333"/><polygon points="30,2 24,12 36,12" fill="#ff44aa"/><circle cx="24" cy="19" r="2.5" fill="#ff0000"/><circle cx="36" cy="19" r="2.5" fill="#ff0000"/><rect x="6" y="28" width="4" height="4" rx="1" fill="#ff0"/><rect x="50" y="30" width="4" height="4" rx="1" fill="#0ff"/></svg>`,
+ketoubat:`<svg viewBox="0 0 60 60"><path d="M8,28 Q4,14 16,20" fill="#4a2060"/><path d="M52,28 Q56,14 44,20" fill="#4a2060"/><ellipse cx="30" cy="38" rx="15" ry="16" fill="#6a30a0"/><circle cx="30" cy="22" r="13" fill="#7a40b0"/><polygon points="20,14 17,4 26,12" fill="#cc80cc"/><polygon points="40,14 43,4 34,12" fill="#cc80cc"/><circle cx="24" cy="22" r="3" fill="#ff0"/><circle cx="24.5" cy="22.5" r="1.5" fill="#000"/><circle cx="36" cy="22" r="3" fill="#ff0"/><circle cx="36.5" cy="22.5" r="1.5" fill="#000"/></svg>`,
+fizzuru:`<svg viewBox="0 0 60 60"><rect x="18" y="22" width="28" height="34" rx="6" fill="#0088cc"/><rect x="26" y="8" width="6" height="18" rx="2.5" fill="#ff6688"/><circle cx="26" cy="38" r="4" fill="#fff"/><circle cx="27" cy="38.8" r="2" fill="#000"/><circle cx="38" cy="38" r="4" fill="#fff"/><circle cx="39" cy="38.8" r="2" fill="#000"/><path d="M26,46 Q32,50 38,46" stroke="#000" stroke-width="1.5" fill="none"/></svg>`,
+crystalus:`<svg viewBox="0 0 60 60"><polygon points="30,4 46,22 40,44 20,44 14,22" fill="#88aaff" opacity=".8"/><circle cx="24" cy="26" r="3" fill="#fff"/><circle cx="24.8" cy="26.8" r="1.5" fill="#2244aa"/><circle cx="36" cy="26" r="3" fill="#fff"/><circle cx="36.8" cy="26.8" r="1.5" fill="#2244aa"/><path d="M25,33 Q30,37 35,33" stroke="#4466cc" stroke-width="1.3" fill="none"/></svg>`,
+ironmacho:`<svg viewBox="0 0 60 60"><rect x="14" y="24" width="32" height="28" rx="3" fill="#556677"/><rect x="14" y="14" width="32" height="12" rx="4" fill="#556677"/><rect x="22" y="18" width="6" height="4" rx="1" fill="#ff4400"/><rect x="32" y="18" width="6" height="4" rx="1" fill="#00ccff"/><rect x="6" y="26" width="8" height="18" rx="3" fill="#556677"/><rect x="46" y="26" width="8" height="18" rx="3" fill="#556677"/></svg>`,
+vortexio:`<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="#110033"/><path d="M30,10 Q50,20 50,30 Q50,50 30,50 Q10,50 10,30 Q10,10 30,10" stroke="#8844ff" stroke-width="2" fill="none"/><circle cx="24" cy="28" r="3.5" fill="#fff"/><circle cx="25" cy="28.8" r="1.8" fill="#6600cc"/><circle cx="36" cy="28" r="3.5" fill="#fff"/><circle cx="37" cy="28.8" r="1.8" fill="#6600cc"/><path d="M25,35 Q30,39 35,35" stroke="#aa66ff" stroke-width="1.5" fill="none"/></svg>`,
+flamurai:`<svg viewBox="0 0 60 60"><rect x="18" y="28" width="24" height="24" rx="4" fill="#cc2200"/><circle cx="30" cy="20" r="13" fill="#dd3300"/><rect x="20" y="8" width="20" height="12" rx="2" fill="#881100"/><rect x="14" y="10" width="5" height="18" rx="2" fill="#cc2200"/><rect x="41" y="10" width="5" height="18" rx="2" fill="#cc2200"/><circle cx="25" cy="20" r="3" fill="#fff"/><circle cx="25.8" cy="20.7" r="1.5" fill="#000"/><circle cx="35" cy="20" r="3" fill="#fff"/><circle cx="35.8" cy="20.7" r="1.5" fill="#000"/></svg>`,
+technocat:`<svg viewBox="0 0 60 60"><rect x="14" y="26" width="32" height="28" rx="6" fill="#334455"/><circle cx="30" cy="20" r="14" fill="#445566"/><polygon points="16,16 10,4 22,12" fill="#334455"/><polygon points="44,16 50,4 38,12" fill="#334455"/><polygon points="17,15 12,7 22,12" fill="#cc44ff"/><polygon points="43,15 48,7 38,12" fill="#cc44ff"/><circle cx="23" cy="20" r="4" fill="#00ffcc"/><circle cx="24.2" cy="21" r="2" fill="#004433"/><circle cx="37" cy="20" r="4" fill="#00ffcc"/><circle cx="38.2" cy="21" r="2" fill="#004433"/></svg>`,
+punchbot:`<svg viewBox="0 0 60 60"><rect x="18" y="22" width="24" height="30" rx="4" fill="#cc4400"/><rect x="16" y="10" width="28" height="14" rx="4" fill="#dd5500"/><circle cx="23" cy="17" r="4" fill="#ffcc00"/><circle cx="24" cy="18" r="2" fill="#cc8800"/><circle cx="37" cy="17" r="4" fill="#ffcc00"/><circle cx="38" cy="18" r="2" fill="#cc8800"/><rect x="4" y="24" width="14" height="10" rx="5" fill="#cc4400"/><rect x="42" y="24" width="14" height="10" rx="5" fill="#cc4400"/></svg>`,
+donutknight:`<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="#e87030"/><circle cx="30" cy="30" r="12" fill="#0d0d1a"/><ellipse cx="30" cy="30" rx="22" ry="8" fill="#ff99aa" opacity=".5"/><circle cx="14" cy="22" r="3" fill="#ffdd44"/><circle cx="46" cy="22" r="3" fill="#ff88aa"/><circle cx="30" cy="12" r="3" fill="#ff44aa"/><circle cx="24" cy="27" r="3" fill="#fff"/><circle cx="24.8" cy="27.8" r="1.5" fill="#000"/><circle cx="36" cy="27" r="3" fill="#fff"/><circle cx="36.8" cy="27.8" r="1.5" fill="#000"/></svg>`,
+tantan:`<svg viewBox="0 0 60 60"><defs><radialGradient id="tg" cx="40%" cy="35%"><stop offset="0%" stop-color="#fff8aa"/><stop offset="100%" stop-color="#cc8800"/></radialGradient></defs><circle cx="30" cy="30" r="24" fill="url(#tg)"/><circle cx="30" cy="30" r="18" fill="#ffaa00"/><circle cx="23" cy="27" r="4" fill="#fff"/><circle cx="24.2" cy="28" r="2" fill="#663300"/><circle cx="37" cy="27" r="4" fill="#fff"/><circle cx="38.2" cy="28" r="2" fill="#663300"/><path d="M24,35 Q30,40 36,35" stroke="#994400" stroke-width="2" fill="none"/></svg>`,
+jellyqueen:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="26" rx="20" ry="18" fill="#ff88cc" opacity=".8"/><path d="M14,36 Q12,48 16,54" stroke="#ff88cc" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M30,40 Q30,52 30,58" stroke="#ff88cc" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M46,36 Q48,48 44,54" stroke="#ff88cc" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="23" cy="22" r="4" fill="#fff"/><circle cx="24" cy="23" r="2" fill="#cc0066"/><circle cx="37" cy="22" r="4" fill="#fff"/><circle cx="38" cy="23" r="2" fill="#cc0066"/><path d="M25,30 Q30,34 35,30" stroke="#cc0066" stroke-width="1.5" fill="none"/></svg>`,
+solarphoenix:`<svg viewBox="0 0 60 60"><path d="M30,10 L36,28 L52,28 L40,38 L44,56 L30,46 L16,56 L20,38 L8,28 L24,28 Z" fill="#ff8800"/><path d="M30,14 L35,28 L48,28 L38,36 L42,50 L30,42 L18,50 L22,36 L12,28 L25,28 Z" fill="#ffcc00"/><circle cx="30" cy="32" r="8" fill="#fff8aa"/><circle cx="26" cy="30" r="2.5" fill="#ff4400"/><circle cx="34" cy="30" r="2.5" fill="#ff4400"/></svg>`,
+draconite:`<svg viewBox="0 0 60 60"><ellipse cx="30" cy="36" rx="16" ry="16" fill="#224488"/><circle cx="30" cy="20" r="14" fill="#335599"/><path d="M18,12 L12,2 L22,10" fill="#224488"/><path d="M42,12 L48,2 L38,10" fill="#224488"/><path d="M18,11 L13,5 L22,9" fill="#88aacc"/><path d="M42,11 L47,5 L38,9" fill="#88aacc"/><circle cx="24" cy="20" r="4" fill="#ffaa00"/><circle cx="25" cy="21" r="2" fill="#000"/><circle cx="36" cy="20" r="4" fill="#ffaa00"/><circle cx="37" cy="21" r="2" fill="#000"/></svg>`,
+whaleasaurus:`<svg viewBox="0 0 60 60"><ellipse cx="28" cy="32" rx="22" ry="16" fill="#1155aa"/><path d="M50,32 Q58,24 56,40Z" fill="#1155aa"/><ellipse cx="28" cy="26" rx="14" ry="8" fill="#2266cc"/><circle cx="18" cy="26" r="5" fill="#fff"/><circle cx="19.5" cy="26.8" r="2.5" fill="#000"/><polygon points="26,36 30,44 34,36" fill="#0a3a88"/></svg>`,
+goldfish_god:`<svg viewBox="0 0 60 60"><defs><radialGradient id="gg" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffeeaa"/><stop offset="100%" stop-color="#ff8800"/></radialGradient></defs><ellipse cx="28" cy="32" rx="18" ry="12" fill="url(#gg)"/><path d="M46,32 Q56,20 54,32 Q56,44 46,32Z" fill="#ffaa00"/><path d="M10,22 Q2,16 8,28Z" fill="#ffaa00"/><path d="M10,42 Q2,48 8,36Z" fill="#ffaa00"/><circle cx="18" cy="28" r="5" fill="#fff"/><circle cx="19.5" cy="29" r="2.5" fill="#000"/><circle cx="40" cy="16" r="4" fill="#ffdd00" opacity=".7"/></svg>`,
+rainbowski:`<svg viewBox="0 0 60 60"><path d="M6,48 Q10,24 30,20 Q50,24 54,48" fill="none" stroke="#ff4444" stroke-width="4"/><path d="M8,50 Q12,28 30,24 Q48,28 52,50" fill="none" stroke="#ff8800" stroke-width="3"/><path d="M10,52 Q14,32 30,28 Q46,32 50,52" fill="none" stroke="#ffdd00" stroke-width="3"/><path d="M12,54 Q16,36 30,32 Q44,36 48,54" fill="none" stroke="#44dd44" stroke-width="3"/><circle cx="30" cy="16" r="10" fill="#f5c5a3"/><circle cx="25" cy="14" r="2.5" fill="#fff"/><circle cx="25.8" cy="14.5" r="1.2" fill="#000"/><circle cx="35" cy="14" r="2.5" fill="#fff"/><circle cx="35.8" cy="14.5" r="1.2" fill="#000"/></svg>`,
+cosmicbrain:`<svg viewBox="0 0 60 60"><defs><radialGradient id="cg" cx="40%" cy="35%"><stop offset="0%" stop-color="#ffaaff"/><stop offset="60%" stop-color="#ff3366"/><stop offset="100%" stop-color="#880022"/></radialGradient></defs><circle cx="30" cy="28" r="22" fill="url(#cg)"/><path d="M16,22 Q20,16 26,20 Q22,12 30,14 Q38,12 34,20 Q40,16 44,22 Q44,30 38,32 Q42,36 36,38 Q32,44 30,40 Q28,44 24,38 Q18,36 22,32 Q16,30 16,22Z" fill="#ffddff" opacity=".3"/><circle cx="23" cy="25" r="4.5" fill="#fff"/><circle cx="24.5" cy="26" r="2.2" fill="#cc0044"/><circle cx="37" cy="25" r="4.5" fill="#fff"/><circle cx="38.5" cy="26" r="2.2" fill="#cc0044"/><path d="M23,33 Q30,38 37,33" stroke="#ff66aa" stroke-width="2" fill="none"/></svg>`,
+omegaboss:`<svg viewBox="0 0 60 60"><defs><radialGradient id="og" cx="50%" cy="30%"><stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#ffdd00"/><stop offset="100%" stop-color="#aa6600"/></radialGradient></defs><polygon points="30,2 38,18 56,18 42,30 48,48 30,38 12,48 18,30 4,18 22,18" fill="url(#og)"/><circle cx="30" cy="28" r="12" fill="#ffcc00" opacity=".9"/><circle cx="24" cy="26" r="3.5" fill="#fff"/><circle cx="25" cy="27" r="1.8" fill="#000"/><circle cx="36" cy="26" r="3.5" fill="#fff"/><circle cx="37" cy="27" r="1.8" fill="#000"/><path d="M24,33 Q30,38 36,33" stroke="#996600" stroke-width="2" fill="none"/></svg>`,
+voidgod:`<svg viewBox="0 0 60 60"><defs><radialGradient id="vgg" cx="50%" cy="40%"><stop offset="0%" stop-color="#cc88ff"/><stop offset="50%" stop-color="#440088"/><stop offset="100%" stop-color="#000011"/></radialGradient></defs><circle cx="30" cy="30" r="26" fill="url(#vgg)"/><path d="M30,4 L34,16 L46,12 L38,22 L50,26 L38,30 L46,42 L34,38 L30,50 L26,38 L14,42 L22,30 L10,26 L22,22 L14,12 L26,16Z" fill="#aa44ff" opacity=".5"/><circle cx="23" cy="27" r="5" fill="#fff"/><circle cx="24.5" cy="28" r="2.5" fill="#220055"/><circle cx="37" cy="27" r="5" fill="#fff"/><circle cx="38.5" cy="28" r="2.5" fill="#220055"/><path d="M22,35 Q30,40 38,35" stroke="#ff88ff" stroke-width="2.5" fill="none"/><circle cx="30" cy="30" r="8" fill="none" stroke="#cc44ff" stroke-width="1" opacity=".6"/><circle cx="30" cy="30" r="14" fill="none" stroke="#8822ff" stroke-width="0.8" opacity=".4"/></svg>`,
+abyssking:`<svg viewBox="0 0 60 60"><defs><radialGradient id="akg" cx="45%" cy="30%"><stop offset="0%" stop-color="#ffaa44"/><stop offset="40%" stop-color="#cc4400"/><stop offset="100%" stop-color="#1a0000"/></radialGradient></defs><rect x="4" y="4" width="52" height="52" rx="8" fill="url(#akg)"/><path d="M30,2 L36,14 L50,10 L42,22 L56,26 L42,30 L50,44 L36,40 L30,54 L24,40 L10,44 L18,30 L4,26 L18,22 L10,10 L24,14Z" fill="#ff6600" opacity=".4"/><circle cx="22" cy="26" r="5" fill="#ffffaa"/><circle cx="23.5" cy="27" r="2.5" fill="#8b0000"/><circle cx="38" cy="26" r="5" fill="#ffffaa"/><circle cx="39.5" cy="27" r="2.5" fill="#8b0000"/><path d="M22,35 Q30,41 38,35" stroke="#ffaa00" stroke-width="3" fill="none"/><path d="M24,16 L22,8 L28,14 L30,6 L32,14 L38,8 L36,16" fill="#ffcc00" stroke="#ff8800" stroke-width="1"/></svg>`,
+omnisecret:`<svg viewBox="0 0 60 60"><defs><radialGradient id="osg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffffff"/><stop offset="25%" stop-color="#00ffff"/><stop offset="60%" stop-color="#ff00ff"/><stop offset="100%" stop-color="#000033"/></radialGradient><radialGradient id="osg2" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffff00"/><stop offset="100%" stop-color="#ff00ff" stop-opacity="0"/></radialGradient></defs><circle cx="30" cy="30" r="28" fill="url(#osg)"/><circle cx="30" cy="30" r="20" fill="url(#osg2)" opacity=".5"/><path d="M30,2 L33,12 L42,6 L38,16 L48,14 L42,22 L52,24 L44,28 L52,34 L42,34 L46,44 L36,40 L34,50 L30,42 L26,50 L24,40 L14,44 L18,34 L8,34 L16,28 L8,24 L18,22 L12,14 L22,16 L18,6 L27,12Z" fill="#fff" opacity=".3"/><circle cx="23" cy="27" r="5.5" fill="#fff"/><circle cx="24.5" cy="28" r="2.8" fill="#00aaff"/><circle cx="26" cy="26.5" r="1" fill="#fff"/><circle cx="37" cy="27" r="5.5" fill="#fff"/><circle cx="38.5" cy="28" r="2.8" fill="#ff00aa"/><circle cx="40" cy="26.5" r="1" fill="#fff"/><path d="M22,36 Q30,43 38,36" stroke="#ffff00" stroke-width="3" fill="none"/><path d="M30,6 L30,2 M30,58 L30,54 M6,30 L2,30 M58,30 L54,30" stroke="#00ffff" stroke-width="1.5" opacity=".8"/></svg>`,
+divinephoenix:`<svg viewBox="0 0 60 60"><defs><radialGradient id="dpbg" cx="50%" cy="35%"><stop offset="0%" stop-color="#fffbe0"/><stop offset="30%" stop-color="#ff8800"/><stop offset="70%" stop-color="#ff3300"/><stop offset="100%" stop-color="#1a0000"/></radialGradient><linearGradient id="dpwing" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffcc00"/><stop offset="50%" stop-color="#ff4400"/><stop offset="100%" stop-color="#ff0000" stop-opacity="0.2"/></linearGradient><radialGradient id="dpglow" cx="50%" cy="50%"><stop offset="0%" stop-color="#ffcc00" stop-opacity="0.8"/><stop offset="100%" stop-color="#ff4400" stop-opacity="0"/></radialGradient></defs>
+<circle cx="30" cy="30" r="29" fill="url(#dpglow)" opacity="0.6"/>
+<circle cx="30" cy="30" r="26" fill="url(#dpbg)"/>
+<path d="M30,28 Q8,10 2,20 Q8,14 16,22 Q8,16 14,28Z" fill="url(#dpwing)" opacity="0.9"/>
+<path d="M30,28 Q52,10 58,20 Q52,14 44,22 Q52,16 46,28Z" fill="url(#dpwing)" opacity="0.9"/>
+<path d="M30,30 Q6,18 0,30 Q6,22 14,30Z" fill="#ff6600" opacity="0.6"/>
+<path d="M30,30 Q54,18 60,30 Q54,22 46,30Z" fill="#ff6600" opacity="0.6"/>
+<path d="M22,10 L18,2 L26,8 L30,0 L34,8 L42,2 L38,10 L30,6Z" fill="#ffcc00"/>
+<path d="M22,10 L18,2 L26,8 L30,0 L34,8 L42,2 L38,10 L30,6Z" fill="#fff" opacity="0.3"/>
+<ellipse cx="30" cy="36" rx="10" ry="11" fill="#fff8e0"/>
+<ellipse cx="30" cy="35" rx="8" ry="9" fill="#ffe8b0"/>
+<path d="M22,30 Q30,27 38,30 L36,42 Q30,45 24,42Z" fill="#ff6600" opacity="0.85"/>
+<path d="M25,30 Q30,28 35,30 L34,40 Q30,43 26,40Z" fill="#ffe0aa"/>
+<path d="M30,31 L31.5,35 L36,35 L32.5,37.5 L34,42 L30,39.5 L26,42 L27.5,37.5 L24,35 L28.5,35Z" fill="#ff4400" opacity="0.95"/>
+<ellipse cx="30" cy="21" rx="8.5" ry="9" fill="#fff8e0"/>
+<path d="M21.5,13 L22,17 L25,14 L27,17.5 L30,13.5 L33,17.5 L35,14 L38,17 L38.5,13 L36,15 L33,12 L30,15 L27,12 L24,15Z" fill="#ffcc00"/>
+<ellipse cx="26.5" cy="22" rx="3" ry="3.2" fill="#fff"/>
+<ellipse cx="33.5" cy="22" rx="3" ry="3.2" fill="#fff"/>
+<circle cx="27" cy="22.5" r="2" fill="#1a0000"/>
+<circle cx="34" cy="22.5" r="2" fill="#1a0000"/>
+<circle cx="27.7" cy="21.8" r="0.8" fill="#ff6600"/>
+<circle cx="34.7" cy="21.8" r="0.8" fill="#ff6600"/>
+<path d="M26,27 Q30,30 34,27" stroke="#cc4400" stroke-width="1.2" fill="none"/>
+<circle cx="10" cy="14" r="1.2" fill="#ffcc00" opacity="0.9"/>
+<circle cx="50" cy="14" r="1.2" fill="#ffcc00" opacity="0.9"/>
+<path d="M8,22 L9.5,20 L11,22 L9.5,24Z" fill="#ff6600" opacity="0.8"/>
+<path d="M49,22 L50.5,20 L52,22 L50.5,24Z" fill="#ff6600" opacity="0.8"/>
+</svg>`,
+divinedemon:`<svg viewBox="0 0 60 60"><defs><radialGradient id="ddbg" cx="50%" cy="35%"><stop offset="0%" stop-color="#cc44ff"/><stop offset="30%" stop-color="#660099"/><stop offset="70%" stop-color="#220033"/><stop offset="100%" stop-color="#000000"/></radialGradient><linearGradient id="ddwing" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#aa00ff"/><stop offset="50%" stop-color="#550088"/><stop offset="100%" stop-color="#000000" stop-opacity="0.3"/></linearGradient><radialGradient id="ddglow" cx="50%" cy="50%"><stop offset="0%" stop-color="#cc44ff" stop-opacity="0.8"/><stop offset="100%" stop-color="#440066" stop-opacity="0"/></radialGradient></defs>
+<circle cx="30" cy="30" r="29" fill="url(#ddglow)" opacity="0.7"/>
+<circle cx="30" cy="30" r="26" fill="url(#ddbg)"/>
+<path d="M18,8 L10,2 L16,12 L8,10 L16,18Z" fill="#cc44ff"/>
+<path d="M42,8 L50,2 L44,12 L52,10 L44,18Z" fill="#cc44ff"/>
+<path d="M30,28 Q10,16 4,26 Q10,18 18,26 Q10,20 16,30Z" fill="url(#ddwing)" opacity="0.9"/>
+<path d="M30,28 Q50,16 56,26 Q50,18 42,26 Q50,20 44,30Z" fill="url(#ddwing)" opacity="0.9"/>
+<path d="M30,30 Q8,20 2,32 Q8,24 16,32Z" fill="#660099" opacity="0.6"/>
+<path d="M30,30 Q52,20 58,32 Q52,24 44,32Z" fill="#660099" opacity="0.6"/>
+<ellipse cx="30" cy="36" rx="10" ry="12" fill="#1a0030"/>
+<ellipse cx="30" cy="35" rx="8" ry="10" fill="#220044"/>
+<path d="M22,30 Q30,26 38,30 L36,43 Q30,47 24,43Z" fill="#880088" opacity="0.9"/>
+<path d="M25,30 Q30,27 35,30 L34,41 Q30,44 26,41Z" fill="#440055"/>
+<path d="M30,31 L31.5,35 L36,35 L32.5,37.5 L34,42 L30,39.5 L26,42 L27.5,37.5 L24,35 L28.5,35Z" fill="#cc44ff" opacity="0.95"/>
+<ellipse cx="30" cy="21" rx="8.5" ry="9" fill="#1a0030"/>
+<path d="M22,14 L18,6 L24,10 L28,4 L30,10 L32,4 L36,10 L42,6 L38,14" fill="#aa00cc" stroke="#cc44ff" stroke-width="0.8"/>
+<ellipse cx="26.5" cy="22" rx="3.2" ry="3.5" fill="#cc88ff"/>
+<ellipse cx="33.5" cy="22" rx="3.2" ry="3.5" fill="#cc88ff"/>
+<circle cx="27" cy="22.5" r="2.2" fill="#110022"/>
+<circle cx="34" cy="22.5" r="2.2" fill="#110022"/>
+<circle cx="27.5" cy="21.8" r="0.9" fill="#ff00ff"/>
+<circle cx="34.5" cy="21.8" r="0.9" fill="#ff00ff"/>
+<path d="M26,27 Q30,31 34,27" stroke="#aa00ff" stroke-width="1.5" fill="none"/>
+<circle cx="30" cy="30" r="10" fill="none" stroke="#aa00ff" stroke-width="0.8" opacity="0.5"/>
+<circle cx="30" cy="30" r="18" fill="none" stroke="#660088" stroke-width="0.6" opacity="0.3"/>
+<circle cx="10" cy="16" r="1.2" fill="#cc44ff" opacity="0.9"/>
+<circle cx="50" cy="16" r="1.2" fill="#cc44ff" opacity="0.9"/>
+<path d="M6,24 L7.5,22 L9,24 L7.5,26Z" fill="#aa00ff" opacity="0.8"/>
+<path d="M51,24 L52.5,22 L54,24 L52.5,26Z" fill="#aa00ff" opacity="0.8"/>
+</svg>`,
+divineemperor:`<svg viewBox="0 0 60 60"><defs><radialGradient id="dvbg" cx="50%" cy="35%"><stop offset="0%" stop-color="#fffbe0"/><stop offset="30%" stop-color="#ffd700"/><stop offset="65%" stop-color="#b8860b"/><stop offset="100%" stop-color="#1a0a00"/></radialGradient><radialGradient id="dvglow" cx="50%" cy="50%"><stop offset="0%" stop-color="#fff9c4" stop-opacity="0.9"/><stop offset="100%" stop-color="#ffd700" stop-opacity="0"/></radialGradient><linearGradient id="dvcrown" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#ffd700"/><stop offset="100%" stop-color="#ff8800"/></linearGradient><linearGradient id="dvwing" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffd700" stop-opacity="0.9"/><stop offset="100%" stop-color="#ff4400" stop-opacity="0.3"/></linearGradient></defs>
+<!-- オーラ -->
+<circle cx="30" cy="30" r="29" fill="url(#dvglow)" opacity="0.5"/>
+<circle cx="30" cy="30" r="26" fill="url(#dvbg)"/>
+<!-- 後光リング -->
+<circle cx="30" cy="13" r="8" fill="none" stroke="#ffd700" stroke-width="1.5" opacity="0.9"/>
+<circle cx="30" cy="13" r="9.5" fill="none" stroke="#fff8dc" stroke-width="0.5" opacity="0.6"/>
+<!-- 翼 -->
+<path d="M30,28 Q14,18 8,26 Q12,22 18,28 Q14,24 20,30Z" fill="url(#dvwing)" opacity="0.85"/>
+<path d="M30,28 Q46,18 52,26 Q48,22 42,28 Q46,24 40,30Z" fill="url(#dvwing)" opacity="0.85"/>
+<path d="M30,30 Q10,22 4,32 Q9,26 16,32Z" fill="#ffd700" opacity="0.5"/>
+<path d="M30,30 Q50,22 56,32 Q51,26 44,32Z" fill="#ffd700" opacity="0.5"/>
+<!-- 体 -->
+<ellipse cx="30" cy="36" rx="10" ry="11" fill="#fffbe0"/>
+<ellipse cx="30" cy="35" rx="8" ry="9" fill="#fff8c0"/>
+<!-- 鎧 -->
+<path d="M22,30 Q30,27 38,30 L36,42 Q30,45 24,42Z" fill="#ffd700" opacity="0.9"/>
+<path d="M25,30 Q30,28 35,30 L34,40 Q30,43 26,40Z" fill="#fff8dc"/>
+<!-- 紋章 -->
+<path d="M30,31 L31.5,35 L36,35 L32.5,37.5 L34,42 L30,39.5 L26,42 L27.5,37.5 L24,35 L28.5,35Z" fill="#ffd700" opacity="0.95"/>
+<!-- 頭 -->
+<ellipse cx="30" cy="21" rx="8.5" ry="9" fill="#fffbe0"/>
+<!-- 王冠 -->
+<path d="M21.5,15 L22,19 L25,16 L27,19.5 L30,15.5 L33,19.5 L35,16 L38,19 L38.5,15 L36,17 L33,14 L30,17 L27,14 L24,17Z" fill="url(#dvcrown)"/>
+<circle cx="30" cy="14.5" r="1.5" fill="#fff"/>
+<circle cx="24" cy="16.5" r="1" fill="#ffd700"/>
+<circle cx="36" cy="16.5" r="1" fill="#ffd700"/>
+<!-- 目 -->
+<ellipse cx="26.5" cy="22" rx="3" ry="3.2" fill="#fff"/>
+<ellipse cx="33.5" cy="22" rx="3" ry="3.2" fill="#fff"/>
+<circle cx="27" cy="22.5" r="2" fill="#1a0a00"/>
+<circle cx="34" cy="22.5" r="2" fill="#1a0a00"/>
+<circle cx="27.7" cy="21.8" r="0.8" fill="#ffd700"/>
+<circle cx="34.7" cy="21.8" r="0.8" fill="#ffd700"/>
+<circle cx="26.2" cy="21.2" r="0.5" fill="#fff" opacity="0.9"/>
+<circle cx="33.2" cy="21.2" r="0.5" fill="#fff" opacity="0.9"/>
+<!-- 口 -->
+<path d="M26,27 Q30,30 34,27" stroke="#b8860b" stroke-width="1.2" fill="none"/>
+<!-- 輝きパーティクル -->
+<circle cx="12" cy="15" r="1" fill="#ffd700" opacity="0.8"/>
+<circle cx="48" cy="15" r="1" fill="#ffd700" opacity="0.8"/>
+<circle cx="8" cy="35" r="0.8" fill="#fff8dc" opacity="0.7"/>
+<circle cx="52" cy="35" r="0.8" fill="#fff8dc" opacity="0.7"/>
+<path d="M10,22 L11.5,20 L13,22 L11.5,24Z" fill="#ffd700" opacity="0.7"/>
+<path d="M47,22 L48.5,20 L50,22 L48.5,24Z" fill="#ffd700" opacity="0.7"/>
+</svg>`
+};
+const CHARACTERS=[
+{id:'tralalero',name:'トラッラレロ',rarity:'common',rate:4,desc:'有名なサメ男。ズボンが特徴的。'},
+{id:'bombardino',name:'ボンバルディーノ',rarity:'common',rate:6,desc:'ワニ。軍用機が好き。'},
+{id:'chimpanzini',name:'チンパンジーニ',rarity:'common',rate:3,desc:'バナナが得意なサル系キャラ。'},
+{id:'crocodilus',name:'クロコディルス',rarity:'common',rate:5,desc:'地を這うワニの亜種。'},
+{id:'cappuccino',name:'カプチーノ',rarity:'common',rate:2,desc:'コーヒー泡の精霊。'},
+{id:'bananaio',name:'バナナイオ',rarity:'common',rate:3.5,desc:'バナナ形の謎の生命体。'},
+{id:'octodino',name:'オクトディーノ',rarity:'common',rate:4,desc:'タコとティラノの合体生物。'},
+{id:'spaghetto',name:'スパゲッティーノ',rarity:'common',rate:3,desc:'麺類の王者。'},
+{id:'derpfish',name:'ダープフィッシュ',rarity:'common',rate:4.5,desc:'ポンコツな顔の魚。'},
+{id:'snailzord',name:'スネイルゾード',rarity:'common',rate:3.5,desc:'殻に隠れるカタツムリの戦士。'},
+{id:'frigo',name:'フリーゴ',rarity:'uncommon',rate:12,desc:'冷蔵庫の精。冷静。'},
+{id:'boiboiboi',name:'ボイボイボイ',rarity:'uncommon',rate:15,desc:'謎の叫び声を発する。'},
+{id:'glorbo',name:'グロルボ',rarity:'uncommon',rate:11,desc:'紫の球体生命体。'},
+{id:'skibidi',name:'スキビディ',rarity:'uncommon',rate:16,desc:'有名な便器の悪魔。'},
+{id:'mutanimals',name:'ミュータニマルズ',rarity:'uncommon',rate:10,desc:'突然変異した生き物。'},
+{id:'gloopii',name:'グルーピー',rarity:'uncommon',rate:9,desc:'スライム系の友好生物。'},
+{id:'noodleface',name:'ヌードルフェイス',rarity:'uncommon',rate:8,desc:'麺が頭から生えてる謎キャラ。'},
+{id:'thunderpig',name:'サンダーピッグ',rarity:'uncommon',rate:13,desc:'稲妻を操るブタ。'},
+{id:'spookster',name:'スプークスター',rarity:'uncommon',rate:10,desc:'フレンドリーな幽霊。'},
+{id:'pizzaface',name:'ピザフェイス',rarity:'uncommon',rate:11,desc:'三角形のピザ生命体。'},
+{id:'hotdogman',name:'ホットドッグマン',rarity:'uncommon',rate:9,desc:'ホットドッグの体を持つ謎の男。'},
+{id:'cheeseborg',name:'チーズボーグ',rarity:'uncommon',rate:12,desc:'チーズでできたロボット。'},
+{id:'lavadrill',name:'ラヴァドリット',rarity:'rare',rate:45,desc:'溶岩ドリルの化身。とても熱い。'},
+{id:'jacko',name:'ジャッコ',rarity:'rare',rate:16,desc:'かぼちゃの亡霊。ハロウィンの主。'},
+{id:'cameraman',name:'カメラマン',rarity:'rare',rate:35,desc:'常にカメラを持っている謎の男。'},
+{id:'robotello',name:'ロボテッロ',rarity:'rare',rate:40,desc:'古代ロボット。AIが宿る。'},
+{id:'zappyboi',name:'ザッピーボーイ',rarity:'rare',rate:38,desc:'電気を操る少年。'},
+{id:'magmakong',name:'マグマコング',rarity:'rare',rate:42,desc:'マグマのゴリラ。迫力満点。'},
+{id:'moonrabbit',name:'ムーンラビット',rarity:'rare',rate:30,desc:'月から来たウサギ。'},
+{id:'beefnado',name:'ビーフナード',rarity:'rare',rate:36,desc:'肉の竜巻。'},
+{id:'aquadoge',name:'アクアドージ',rarity:'rare',rate:32,desc:'波乗りが得意な犬。'},
+{id:'turbosnake',name:'ターボスネーク',rarity:'rare',rate:44,desc:'超高速のヘビ。音速で走る。'},
+{id:'stormcrow',name:'ストームクロウ',rarity:'rare',rate:34,desc:'嵐を呼ぶ黒いカラス。'},
+{id:'sandworm',name:'サンドワーム',rarity:'rare',rate:39,desc:'砂漠の地下を駆け抜けるワーム。'},
+{id:'partybandi',name:'パーティバンディット',rarity:'epic',rate:100,desc:'パーティを乗っ取る最強の泥棒。'},
+{id:'ketoubat',name:'ケトゥバット',rarity:'epic',rate:120,desc:'ネコとコウモリのハイブリッド。'},
+{id:'fizzuru',name:'フィズルー',rarity:'epic',rate:95,desc:'炭酸の精霊。シュワシュワ。'},
+{id:'crystalus',name:'クリスタルス',rarity:'epic',rate:110,desc:'水晶の体を持つ神秘生物。'},
+{id:'ironmacho',name:'アイアンマッチョ',rarity:'epic',rate:105,desc:'鋼鉄の筋肉マン。'},
+{id:'vortexio',name:'ヴォルテクシオ',rarity:'epic',rate:115,desc:'渦巻きの次元から来た存在。'},
+{id:'flamurai',name:'フラムライ',rarity:'epic',rate:98,desc:'炎の侍。刀は火炎放射。'},
+{id:'technocat',name:'テクノキャット',rarity:'epic',rate:108,desc:'サイバネティクス猫。量子CPUが脳に。'},
+{id:'punchbot',name:'パンチボット',rarity:'epic',rate:102,desc:'パンチが専門の戦闘ロボ。'},
+{id:'donutknight',name:'ドーナツナイト',rarity:'epic',rate:112,desc:'ドーナツの守護騎士。甘い戦士。'},
+{id:'tantan',name:'タンタン・ケレタン',rarity:'legendary',rate:500,desc:'謎の存在。その力は計り知れない。'},
+{id:'jellyqueen',name:'ジェリークイーン',rarity:'legendary',rate:480,desc:'クラゲの女王。海の支配者。'},
+{id:'solarphoenix',name:'ソーラーフェニックス',rarity:'legendary',rate:520,desc:'太陽の力を宿す不死鳥。'},
+{id:'draconite',name:'ドラコナイト',rarity:'legendary',rate:490,desc:'古代竜の魂を持つ騎士。'},
+{id:'whaleasaurus',name:'クジラザウルス',rarity:'legendary',rate:460,desc:'クジラと恐竜の合体生物。'},
+{id:'goldfish_god',name:'金魚神',rarity:'legendary',rate:510,desc:'神格化された金魚。願いを叶える。'},
+{id:'rainbowski',name:'レインボースキー',rarity:'legendary',rate:470,desc:'虹を纏う謎のスキーヤー。'},
+{id:'cosmicbrain',name:'コズミックブレイン',rarity:'mythic',rate:9999,desc:'宇宙の知性の具現化。⚗️融合でのみ入手可能！'},
+{id:'omegaboss',name:'オメガボス',rarity:'mythic',rate:99999,desc:'全てのブレインロットの支配者。⚗️伝説の融合が必要！'},
+{id:'voidgod',name:'ヴォイドゴッド',rarity:'supermythic',rate:499999,desc:'虚空に座する神。コズミックとオメガの間に存在する。⚗️スーパーミシック融合で入手！'},
+{id:'abyssking',name:'アビスキング',rarity:'supermythic',rate:599999,desc:'深淵の支配者。その力はオメガを凌駕する。⚗️スーパーミシック融合で入手！'},
+{id:'omnisecret',name:'オムニシークレット・Ω',rarity:'secret',rate:9999999,desc:'全ての次元を超えた存在。シークレット融合でのみ降臨！変異を纏い、宇宙の全てを支配する。'},
+{id:'divineemperor',name:'神域皇帝 ディバイン',rarity:'divine',rate:99999999,desc:'全てを超越した神域の皇帝。図鑑完全制覇＋変異シークレット5体の合成でのみ降臨する唯一絶対の存在。✨DIVINE FUSION✨'},
+{id:'divinephoenix',name:'神炎鳳凰 フェニクシア',rarity:'divine',rate:150000000,desc:'神域の炎を纏う不死の鳳凰。ガチャで3%の確率で降臨する。世界を焼き尽くす究極の炎を持つ。✨GACHA DIVINE✨'},
+{id:'divinedemon',name:'魔神大帝 アビゾス',rarity:'divine',rate:500000000,desc:'神域を超えた魔の頂点。ガチャで0.1%の超低確率で降臨する伝説の存在。宇宙の終焉を司る。✨ULTRA RARE DIVINE✨'}
+];
+
+// svgChar は SVGS を使うので SVGS 定義後に置く
+function svgChar(id){
+  var d=SVGS[id];
+  return d||'<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="#556"/><text x="30" y="36" text-anchor="middle" font-size="14" fill="#fff">?</text></svg>';
+}
 
 const MUTATIONS={
   blaze:  {id:'blaze',  name:'🔥炎熱', color:'#ff4400',atkMult:3.0,hpMult:1.0,spdMult:1.0},
@@ -163,53 +366,42 @@ const RARITY_ORDER=['common','uncommon','rare','epic','legendary','mythic','supe
 const RARITIES={common:{label:'COMMON'},uncommon:{label:'UNCOMMON'},rare:{label:'RARE'},epic:{label:'EPIC'},legendary:{label:'LEGENDARY'},mythic:{label:'MYTHIC'},supermythic:{label:'SUPER MYTHIC'},secret:{label:'SECRET'},divine:{label:'DIVINE'}};
 const SAVE_KEY='brainrot_v3';
 
-function svgChar(id){
-  var d=SVGS[id];
-  return d||'<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="#556"/><text x="30" y="36" text-anchor="middle" font-size="14" fill="#fff">?</text></svg>';
-}
-
-// ─── 【修正①】コレクターのセーブデータ読み込み ───
-// invItems（インベントリ）と base（基地配置）の両方を読む
-// 基地上の変異は mutations["charId_slot"] = [{id,...},...] 形式で保存されている
+// ─── コレクターデータ読み込み（invItems + base + mutations両対応）───
 function getOwnedData(){
   try{
     var raw=localStorage.getItem(SAVE_KEY);
     if(!raw)return null;
     var d=JSON.parse(raw);
     var inv={};
-
-    // インベントリ内キャラ
+    // ① インベントリ内キャラ
     (d.invItems||[]).forEach(function(it){
       if(!inv[it.charId])inv[it.charId]=[];
       inv[it.charId].push({muts:it.muts||[]});
     });
-
-    // 基地に配置されているキャラ（変異情報もdecode）
+    // ② 基地配置キャラ（変異は mutations["charId_slot"] から取得）
     var mutData=d.mutations||{};
     (d.base||[]).forEach(function(b){
       if(!inv[b.charId])inv[b.charId]=[];
       var key=b.charId+'_'+b.slot;
       var baseMutObjs=mutData[key]||[];
       var baseMutIds=[];
-      baseMutObjs.forEach(function(m){ if(m&&m.id)baseMutIds.push(m.id); });
+      baseMutObjs.forEach(function(m){if(m&&m.id)baseMutIds.push(m.id);});
       inv[b.charId].push({muts:baseMutIds});
     });
-
     return Object.keys(inv).length>0?inv:null;
   }catch(e){return null;}
 }
 
-// ─── 【修正②】コレクターへの反映 ───
-// 奪取成功：ボットのキャラをコレクターのinvItemsに追加
-function addCharToCollector(charId, muts){
+// ─── コレクターへの書き戻し ───
+function addCharToCollector(charId,muts){
   try{
     var raw=localStorage.getItem(SAVE_KEY);
-    if(!raw){ showCollectorNote('⚠️ コレクターデータなし（反映スキップ）'); return; }
+    if(!raw){showCollectorNote('⚠️ コレクターデータなし（反映スキップ）');return;}
     var d=JSON.parse(raw);
     if(!d.invItems)d.invItems=[];
     if(!d.discovered)d.discovered=[];
     var uid='fighter_'+(Date.now()%1e9)+'_'+Math.floor(Math.random()*9999);
-    d.invItems.push({uid:uid, charId:charId, muts:muts||[]});
+    d.invItems.push({uid:uid,charId:charId,muts:muts||[]});
     if(!d.inventory)d.inventory={};
     d.inventory[charId]=(d.inventory[charId]||0)+1;
     if(d.discovered.indexOf(charId)<0)d.discovered.push(charId);
@@ -218,34 +410,26 @@ function addCharToCollector(charId, muts){
     localStorage.setItem(SAVE_KEY,JSON.stringify(d));
     var c=CHARACTERS.find(function(x){return x.id===charId;});
     showCollectorNote('✅ '+(c?c.name:charId)+' をコレクターに追加！');
-  }catch(e){ showCollectorNote('❌ コレクター反映失敗: '+e.message); }
+  }catch(e){showCollectorNote('❌ コレクター反映失敗: '+e.message);}
 }
 
-// 奪取失敗（ボットに奪われた）：プレイヤーのキャラをinvItemsから1個削除
 function removeCharFromCollector(charId){
   try{
     var raw=localStorage.getItem(SAVE_KEY);
     if(!raw)return;
     var d=JSON.parse(raw);
     if(!d.invItems||!d.invItems.length)return;
-    // 変異なし優先で1個削除
     var idx=-1;
     for(var i=0;i<d.invItems.length;i++){
-      if(d.invItems[i].charId===charId&&(!d.invItems[i].muts||!d.invItems[i].muts.length)){
-        idx=i;break;
-      }
+      if(d.invItems[i].charId===charId&&(!d.invItems[i].muts||!d.invItems[i].muts.length)){idx=i;break;}
     }
-    if(idx<0){
-      for(var i=0;i<d.invItems.length;i++){
-        if(d.invItems[i].charId===charId){idx=i;break;}
-      }
-    }
+    if(idx<0){for(var i=0;i<d.invItems.length;i++){if(d.invItems[i].charId===charId){idx=i;break;}}}
     if(idx>=0){
       d.invItems.splice(idx,1);
       if(d.inventory&&d.inventory[charId]>0)d.inventory[charId]--;
       localStorage.setItem(SAVE_KEY,JSON.stringify(d));
       var c=CHARACTERS.find(function(x){return x.id===charId;});
-      showCollectorNote('💀 '+(c?c.name:charId)+' がボットに奪われた…コレクターから消えた！');
+      showCollectorNote('💀 '+(c?c.name:charId)+' がボットに奪われた…');
     }
   }catch(e){}
 }
@@ -254,23 +438,17 @@ var _collectorNoteTimer=null;
 function showCollectorNote(msg){
   var el=document.getElementById('collector-note');
   if(!el)return;
-  el.textContent=msg;
-  el.style.opacity='1';
+  el.textContent=msg;el.style.opacity='1';
   clearTimeout(_collectorNoteTimer);
   _collectorNoteTimer=setTimeout(function(){el.style.opacity='0';},4000);
 }
 
 // ─── STATS ───
 const RARITY_STATS={
-  common:   {hp:100,atk:8, spd:3.8},
-  uncommon: {hp:120,atk:10,spd:4.0},
-  rare:     {hp:145,atk:13,spd:4.3},
-  epic:     {hp:175,atk:17,spd:4.6},
-  legendary:{hp:210,atk:22,spd:5.0},
-  mythic:   {hp:260,atk:30,spd:5.3},
-  supermythic:{hp:320,atk:40,spd:5.6},
-  secret:   {hp:400,atk:55,spd:6.0},
-  divine:   {hp:500,atk:70,spd:6.4},
+  common:{hp:100,atk:8,spd:3.8},uncommon:{hp:120,atk:10,spd:4.0},
+  rare:{hp:145,atk:13,spd:4.3},epic:{hp:175,atk:17,spd:4.6},
+  legendary:{hp:210,atk:22,spd:5.0},mythic:{hp:260,atk:30,spd:5.3},
+  supermythic:{hp:320,atk:40,spd:5.6},secret:{hp:400,atk:55,spd:6.0},divine:{hp:500,atk:70,spd:6.4},
 };
 function getBaseStats(charId){
   var c=CHARACTERS.find(function(x){return x.id===charId;});
@@ -279,25 +457,22 @@ function getBaseStats(charId){
   return {hp:s.hp,atk:s.atk,spd:s.spd};
 }
 function applyMut(stats,mutId){
-  var m=MUTATIONS[mutId];
-  if(!m)return stats;
+  var m=MUTATIONS[mutId];if(!m)return stats;
   return {hp:Math.round(stats.hp*(m.hpMult||1)),atk:Math.round(stats.atk*(m.atkMult||1)),spd:+(stats.spd*(m.spdMult||1)).toFixed(2)};
 }
 function getRarityIdx(r){return RARITY_ORDER.indexOf(r);}
 
-// ─── SELECT SCREEN ───
-var picked=[null,null], pickedMut=[null,null];
-var ownedData=null;
+// ─── SELECT ───
+var picked=[null,null],pickedMut=[null,null],ownedData=null;
 
 function initSelect(){
   ownedData=getOwnedData();
   var note=document.getElementById('save-note');
   if(!ownedData){
-    note.textContent='⚠️ コレクターのセーブデータが見つかりません。全キャラ使用可。';
+    note.textContent='⚠️ コレクターのセーブデータが見つかりません。';
     ownedData={};
-    CHARACTERS.forEach(function(c){ownedData[c.id]=[{muts:[]}];});
   } else {
-    note.innerHTML='✅ コレクターデータ読み込み完了<br>所持キャラ＋レア度1個上まで選択可。';
+    note.innerHTML='✅ コレクターデータ読み込み完了 — 所持キャラのみ選択可';
   }
   buildGrid(0);
   buildGrid(1);
@@ -309,28 +484,16 @@ function buildGrid(pidx){
   grid.innerHTML='';
   CHARACTERS.forEach(function(c){
     var owned=(ownedData[c.id]||[]).length>0;
-    var rarityUpOk=false;
-    if(!owned){
-      var thisIdx=getRarityIdx(c.rarity);
-      if(thisIdx>0){
-        var lowerRarity=RARITY_ORDER[thisIdx-1];
-        rarityUpOk=CHARACTERS.some(function(other){
-          return other.rarity===lowerRarity&&(ownedData[other.id]||[]).length>0;
-        });
-      }
-    }
-    var selectable=owned||rarityUpOk;
+    if(!owned)return; // 所持キャラのみ表示
     var card=document.createElement('div');
-    card.className='pcard'+(selectable?(rarityUpOk&&!owned?' rarity-up':''):' locked');
+    card.className='pcard';
     card.setAttribute('data-id',c.id);
     card.innerHTML=svgChar(c.id)+
       '<div class="pname">'+c.name+'</div>'+
       '<div class="prarity r-'+c.rarity+'">'+(RARITIES[c.rarity]?RARITIES[c.rarity].label:c.rarity)+'</div>';
-    if(selectable){
-      (function(charId,isRarityUp){
-        card.onclick=function(){pickChar(pidx,charId,isRarityUp);};
-      })(c.id,rarityUpOk&&!owned);
-    }
+    (function(charId){
+      card.onclick=function(){pickChar(pidx,charId,false);};
+    })(c.id);
     grid.appendChild(card);
   });
 }
@@ -341,7 +504,7 @@ function pickChar(pidx,charId,isRarityUp){
   if(pidx===0){
     var items=ownedData[charId]||[];
     var mutItem=items.find(function(it){return it.muts&&it.muts.length>0;});
-    if(mutItem) pickedMut[0]=mutItem.muts[0];
+    if(mutItem)pickedMut[0]=mutItem.muts[0];
     else pickedMut[0]=MUTATION_POOL[Math.floor(Math.random()*MUTATION_POOL.length)];
   } else {
     pickedMut[1]=null;
@@ -359,17 +522,12 @@ function pickChar(pidx,charId,isRarityUp){
   checkStart();
 }
 
-function checkStart(){
-  document.getElementById('start-btn').disabled=!(picked[0]&&picked[1]);
-}
-document.getElementById('start-btn').onclick=function(){
-  if(picked[0]&&picked[1])startGame(picked[0],picked[1],pickedMut[0],pickedMut[1]);
-};
+function checkStart(){document.getElementById('start-btn').disabled=!(picked[0]&&picked[1]);}
+document.getElementById('start-btn').onclick=function(){if(picked[0]&&picked[1])startGame(picked[0],picked[1],pickedMut[0],pickedMut[1]);};
 function showSelect(){
   gameRunning=false;
   document.getElementById('screen-select').style.display='flex';
   document.getElementById('screen-game').style.display='none';
-  // セレクト画面に戻ったらデータを再読み込み
   initSelect();
 }
 
@@ -392,29 +550,32 @@ function botThink(){
   var dx=player.x-bot.x;
   var dist=Math.abs(dx);
   botAI.thinkTimer++;
-  if(botAI.thinkTimer<8)return;
+  if(botAI.thinkTimer<6)return;
   botAI.thinkTimer=0;
+
+  // キャリー中は自分の基地へ戻る（最優先）
   if(stealState.active&&stealState.carrier===0){
     var baseCenter=BASE.bot.x+BASE.bot.w/2;
-    bot.keys.left=bot.x>baseCenter+10;
-    bot.keys.right=bot.x<baseCenter-10;
-    bot.keys.attack=false;
-    return;
+    bot.keys.left=bot.x>baseCenter+10;bot.keys.right=bot.x<baseCenter-10;bot.keys.attack=false;return;
   }
-  if(dist<40){
+
+  // 常にプレイヤーを目指す（HP低くても逃げない）
+  if(dist<36){
+    // 近接：攻撃しながら密着維持
     bot.keys.left=false;bot.keys.right=false;bot.keys.attack=true;
-    if(Math.random()<0.03&&bot.onGround)bot.keys.up=true;else bot.keys.up=false;
+    // 少しランダムに飛び込む
+    if(Math.random()<0.05&&bot.onGround)bot.keys.up=true;else bot.keys.up=false;
+  } else if(dist<90){
+    // 中距離：全力で近づきながら攻撃
+    bot.keys.attack=true;bot.keys.up=false;
+    if(dx>0){bot.keys.left=false;bot.keys.right=true;}else{bot.keys.left=true;bot.keys.right=false;}
+    // たまにジャンプして突っ込む
+    if(Math.random()<0.04&&bot.onGround){bot.keys.up=true;}
   } else {
+    // 遠距離：プレイヤーへ走る
     bot.keys.attack=false;bot.keys.up=false;
-    if(dx>0){bot.keys.left=false;bot.keys.right=true;}
-    else{bot.keys.left=true;bot.keys.right=false;}
-    if(Math.random()<0.01&&bot.onGround)bot.keys.up=true;
-  }
-  if(bot.hp<bot.maxHp*0.25){
-    var baseCenter=BASE.bot.x+BASE.bot.w/2;
-    bot.keys.right=bot.x<baseCenter;
-    bot.keys.left=bot.x>baseCenter;
-    bot.keys.attack=false;
+    if(dx>0){bot.keys.left=false;bot.keys.right=true;}else{bot.keys.left=true;bot.keys.right=false;}
+    if(Math.random()<0.02&&bot.onGround)bot.keys.up=true;
   }
 }
 
@@ -469,8 +630,7 @@ function updateMutLabels(){
 }
 
 document.addEventListener('keydown',function(e){
-  var k=e.key.toLowerCase();
-  if(!players[1])return;
+  var k=e.key.toLowerCase();if(!players[1])return;
   var km=players[1].keyMap;
   if(k===km.left){players[1].keys.left=true;e.preventDefault();}
   if(k===km.right){players[1].keys.right=true;e.preventDefault();}
@@ -478,8 +638,7 @@ document.addEventListener('keydown',function(e){
   if(k===km.attack){players[1].keys.attack=true;e.preventDefault();}
 });
 document.addEventListener('keyup',function(e){
-  var k=e.key.toLowerCase();
-  if(!players[1])return;
+  var k=e.key.toLowerCase();if(!players[1])return;
   var km=players[1].keyMap;
   if(k===km.left)players[1].keys.left=false;
   if(k===km.right)players[1].keys.right=false;
@@ -488,8 +647,7 @@ document.addEventListener('keyup',function(e){
 });
 
 [['btn-l','left'],['btn-r','right'],['btn-u','up'],['btn-a','attack']].forEach(function(pair){
-  var el=document.getElementById(pair[0]);
-  if(!el)return;
+  var el=document.getElementById(pair[0]);if(!el)return;
   var key=pair[1];
   el.addEventListener('touchstart',function(e){e.preventDefault();if(players[1])players[1].keys[key]=true;},{passive:false});
   el.addEventListener('touchend',function(e){e.preventDefault();if(players[1])players[1].keys[key]=false;},{passive:false});
@@ -505,8 +663,7 @@ function getSVGImg(id){
     var blob=new Blob([svgChar(id)],{type:'image/svg+xml'});
     var url=URL.createObjectURL(blob);
     var img=new Image();
-    img.onload=function(){svgCache[id]=img;};
-    img.onerror=function(){svgCache[id]=false;};
+    img.onload=function(){svgCache[id]=img;};img.onerror=function(){svgCache[id]=false;};
     img.src=url;
   }catch(ex){svgCache[id]=false;}
   return null;
@@ -522,114 +679,83 @@ function update(){
   botThink();
   players.forEach(function(p,i){
     var other=players[1-i];
-    if(p.keys.left){p.vx=-p.spd;p.dir=-1;}
-    else if(p.keys.right){p.vx=p.spd;p.dir=1;}
-    else p.vx*=0.72;
+    if(p.keys.left){p.vx+=((-p.spd)-p.vx)*0.35;p.dir=-1;}
+    else if(p.keys.right){p.vx+=((p.spd)-p.vx)*0.35;p.dir=1;}
+    else p.vx*=0.62;
     if(stealState.active&&stealState.carrier===i)p.vx*=0.75;
-    if(p.keys.up&&p.onGround){p.vy=-12.5;p.onGround=false;}
-    p.vy+=0.65;p.x+=p.vx;p.y+=p.vy;
+    if(p.keys.up&&p.onGround){p.vy=-15;p.onGround=false;}
+    p.vy+=0.55;p.x+=p.vx;p.y+=p.vy;
     if(p.y>=GROUND){p.y=GROUND;p.vy=0;p.onGround=true;}
     p.x=Math.max(5,Math.min(W-5,p.x));
     if(p.keys.attack&&!p.attacking&&p.attackTimer<=0){p.attacking=true;p.attackTimer=20;}
     if(p.attackTimer>0)p.attackTimer--;else p.attacking=false;
     if(p.attacking&&p.attackTimer>12){
-      var px=p.x+p.dir*28,py=p.y-28;
+      var px=p.x+p.dir*18,py=p.y-28;
       var ox=other.x,oy=other.y-28;
-      if(Math.abs(px-ox)<34&&Math.abs(py-oy)<40&&other.hitTimer<=0){
-        other.hp=Math.max(0,other.hp-p.atk);
-        other.hitTimer=22;other.vx=p.dir*4.5;other.vy=-2.5;
+      if(Math.abs(px-ox)<22&&Math.abs(py-oy)<28&&other.hitTimer<=0){
+        other.hitTimer=22;other.vx=p.dir*5.5;other.vy=-3.5;
         addParticle(other.x,other.y-28,other.color);
         if(stealState.active&&stealState.carrier===1-i){
           stealState.active=false;stealState.carrier=null;stealState.progress=0;
           document.getElementById('carry-bar-wrap').style.display='none';
           addParticle(other.x,other.y,'#ffcc00');
         }
-        updateUI();
-        if(other.hp<=0){other.hp=0;updateUI();respawnPlayer(1-i);}
       }
     }
     if(p.hitTimer>0)p.hitTimer--;
   });
-
-  var player=players[1];
-  var bot=players[0];
+  var player=players[1],bot=players[0];
   if(player&&bot){
     if(!stealState.active){
       if(playerInBase(player,BASE.bot)){
         stealState.active=true;stealState.carrier=1;stealState.progress=0;
         document.getElementById('carry-bar-wrap').style.display='block';
         document.getElementById('msg').textContent='🏃 自分の基地まで運べ！';
-      } else if(playerInBase(bot,BASE.player)&&!stealState.active){
+      } else if(playerInBase(bot,BASE.player)){
         stealState.active=true;stealState.carrier=0;stealState.progress=0;
       }
     } else {
       stealState.progress=Math.min(stealState.progress+0.3,100);
       var carrierPl=players[stealState.carrier];
       var targetBase=stealState.carrier===1?BASE.player:BASE.bot;
-      if(playerInBase(carrierPl,targetBase)&&stealState.progress>=100){
-        endRound(stealState.carrier,'steal');
-        return;
-      }
+      if(playerInBase(carrierPl,targetBase)&&stealState.progress>=100){endRound(stealState.carrier,'steal');return;}
       if(stealState.carrier===1){
         document.getElementById('carry-bar').style.width=stealState.progress+'%';
         document.getElementById('carry-label').textContent='キャラを運んでいる… 自分の基地へ！';
       }
     }
   }
-
   for(var i=particles.length-1;i>=0;i--){
-    var pt=particles[i];
-    pt.x+=pt.vx;pt.y+=pt.vy;pt.vy+=0.3;pt.life--;
+    var pt=particles[i];pt.x+=pt.vx;pt.y+=pt.vy;pt.vy+=0.3;pt.life--;
     if(pt.life<=0)particles.splice(i,1);
   }
 }
 
-function playerInBase(p,base){
-  return p.x>base.x&&p.x<base.x+base.w&&p.y>base.y&&p.y<base.y+base.h+GROUND;
-}
+function playerInBase(p,base){return p.x>base.x&&p.x<base.x+base.w&&p.y>base.y&&p.y<base.y+base.h+GROUND;}
 
-function respawnPlayer(idx){
-  var p=players[idx];
-  var s=getBaseStats(p.charId);
-  if(p.mutId)s=applyMut(s,p.mutId);
-  p.hp=s.hp;p.maxHp=s.hp;
-  p.x=idx===0?BASE.bot.x+BASE.bot.w/2:BASE.player.x+BASE.player.w/2;
-  p.y=GROUND;p.vx=0;p.vy=0;p.attacking=false;p.attackTimer=0;p.hitTimer=0;
-  addParticle(p.x,p.y,p.color);
-  updateUI();
-}
 
-// ─── 【修正③】endRound にコレクター連携を追加 ───
+
 function endRound(winner,reason){
   if(gameState!=='play')return;
-  gameState='end';
-  score[winner]++;
-  updateUI();
+  gameState='end';score[winner]++;updateUI();
   stealState={active:false,carrier:null,progress:0};
   document.getElementById('carry-bar-wrap').style.display='none';
-
   var wname=CHARACTERS.find(function(x){return x.id===players[winner].charId;});
   var msg='';
-
   if(reason==='steal'){
     if(winner===1){
-      // プレイヤーがボットのキャラを奪った
-      // ボットキャラ（変異付き）をコレクターに追加
-      var botCharId=players[0].charId;
+      // プレイヤーがボットキャラを奪った → コレクターに追加
       var botMuts=players[0].mutId?[players[0].mutId]:[];
-      addCharToCollector(botCharId, botMuts);
+      addCharToCollector(players[0].charId,botMuts);
       msg='🎉 キャラ奪取成功！あなたの勝ち！';
     } else {
-      // ボットがプレイヤーのキャラを奪った
-      // プレイヤーのキャラをコレクターから削除
-      var playerCharId=players[1].charId;
-      removeCharFromCollector(playerCharId);
+      // ボットがプレイヤーキャラを奪った → コレクターから削除
+      removeCharFromCollector(players[1].charId);
       msg='💀 ボットに奪われた…ボットの勝ち';
     }
   } else {
     msg=(winner===1?'🎉 あなたの勝ち！':'💀 ボットの勝ち…')+(wname?' ('+wname.name+')':'');
   }
-
   document.getElementById('msg').textContent=msg+' タップで再戦！';
   canvas.addEventListener('click',restartRound,{once:true});
   canvas.addEventListener('touchend',restartRound,{once:true});
@@ -637,14 +763,10 @@ function endRound(winner,reason){
 
 function restartRound(){
   if(gameState!=='end')return;
-  gameState='play';
-  stealState={active:false,carrier:null,progress:0};
+  gameState='play';stealState={active:false,carrier:null,progress:0};
   botAI={state:'idle',target:null,stealTimer:0,thinkTimer:0};
   document.getElementById('carry-bar-wrap').style.display='none';
   players.forEach(function(p,i){
-    var s=getBaseStats(p.charId);
-    if(p.mutId)s=applyMut(s,p.mutId);
-    p.hp=s.hp;p.maxHp=s.hp;
     p.x=i===0?BASE.bot.x+BASE.bot.w/2:BASE.player.x+BASE.player.w/2;
     p.y=GROUND;p.vx=0;p.vy=0;p.attacking=false;p.attackTimer=0;p.hitTimer=0;
   });
@@ -655,106 +777,76 @@ function restartRound(){
 
 function updateUI(){
   if(!players[0]||!players[1])return;
-  document.getElementById('hp1-bar').style.width=(players[0].hp/players[0].maxHp*100)+'%';
-  document.getElementById('hp2-bar').style.width=(players[1].hp/players[1].maxHp*100)+'%';
   document.getElementById('score-text').textContent=score[1]+' - '+score[0];
 }
 
 function drawMutAura(p){
-  if(!p.mutId)return;
-  var m=MUTATIONS[p.mutId];if(!m)return;
+  if(!p.mutId)return;var m=MUTATIONS[p.mutId];if(!m)return;
   var t=Date.now()/700;
-  ctx.save();
-  ctx.globalAlpha=0.2+0.1*Math.sin(t);
+  ctx.save();ctx.globalAlpha=0.2+0.1*Math.sin(t);
   ctx.beginPath();ctx.arc(p.x,p.y-28,24,0,Math.PI*2);
   ctx.strokeStyle=m.color;ctx.lineWidth=2.5;ctx.stroke();
   var ox=p.x+Math.cos(t*2.5)*24,oy=(p.y-28)+Math.sin(t*2.5)*24;
-  ctx.beginPath();ctx.arc(ox,oy,3.5,0,Math.PI*2);
-  ctx.fillStyle=m.color;ctx.fill();
+  ctx.beginPath();ctx.arc(ox,oy,3.5,0,Math.PI*2);ctx.fillStyle=m.color;ctx.fill();
   ctx.restore();
 }
 
 function drawCharSVG(p){
-  var img=getSVGImg(p.charId);
-  var sw=48,sh=48;
+  var img=getSVGImg(p.charId);var sw=48,sh=48;
   ctx.save();
   if(p.hitTimer>0)ctx.globalAlpha=p.hitTimer%4<2?0.3:1;
-  ctx.translate(p.x,p.y);
-  if(p.dir<0)ctx.scale(-1,1);
-  if(img){
-    ctx.drawImage(img,-sw/2,-sh,sw,sh);
-  } else {
-    ctx.beginPath();ctx.arc(0,-sh/2,20,0,Math.PI*2);
-    ctx.fillStyle=p.color;ctx.fill();
+  ctx.translate(p.x,p.y);if(p.dir<0)ctx.scale(-1,1);
+  if(img){ctx.drawImage(img,-sw/2,-sh,sw,sh);}
+  else{
+    ctx.beginPath();ctx.arc(0,-sh/2,20,0,Math.PI*2);ctx.fillStyle=p.color;ctx.fill();
     ctx.fillStyle='#fff';ctx.font='7px sans-serif';ctx.textAlign='center';
     var c=CHARACTERS.find(function(x){return x.id===p.charId;});
     ctx.fillText(c?c.name.slice(0,4):'?',0,-sh/2+4);
   }
   if(stealState.active&&stealState.carrier===p.idx){
-    ctx.globalAlpha=0.9;
-    ctx.font='18px sans-serif';ctx.textAlign='center';
-    ctx.fillText('📦',0,-sh-6);
+    ctx.globalAlpha=0.9;ctx.font='18px sans-serif';ctx.textAlign='center';ctx.fillText('📦',0,-sh-6);
   }
   if(p.attacking&&p.attackTimer>8){
     ctx.beginPath();ctx.arc(p.dir*24,-sh/2,12,0,Math.PI*2);
     ctx.strokeStyle=p.color;ctx.lineWidth=2.5;ctx.globalAlpha=0.5;ctx.stroke();
   }
-  ctx.restore();
-  drawMutAura(p);
-  ctx.save();
-  var m=p.mutId?MUTATIONS[p.mutId]:null;
-  ctx.fillStyle=m?m.color:p.color;
-  ctx.font='bold 8px sans-serif';ctx.textAlign='center';
-  ctx.fillText((p.idx===0?'🤖':'🎮'),p.x,p.y-sh-4);
-  ctx.restore();
+  ctx.restore();drawMutAura(p);
+  ctx.save();var m=p.mutId?MUTATIONS[p.mutId]:null;
+  ctx.fillStyle=m?m.color:p.color;ctx.font='bold 8px sans-serif';ctx.textAlign='center';
+  ctx.fillText((p.idx===0?'🤖':'🎮'),p.x,p.y-sh-4);ctx.restore();
 }
 
 function drawBase(base,color,label,charId,isBot){
   ctx.save();
-  ctx.fillStyle='rgba('+hexToRgb(color)+',0.08)';
-  ctx.fillRect(base.x,base.y,base.w,GROUND-base.y);
+  ctx.fillStyle='rgba('+hexToRgb(color)+',0.08)';ctx.fillRect(base.x,base.y,base.w,GROUND-base.y);
   ctx.strokeStyle=color;ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
-  ctx.beginPath();
-  ctx.moveTo(base.x,GROUND);
-  ctx.lineTo(base.x,base.y);
-  ctx.lineTo(base.x+base.w,base.y);
-  ctx.lineTo(base.x+base.w,GROUND);
-  ctx.stroke();
+  ctx.beginPath();ctx.moveTo(base.x,GROUND);ctx.lineTo(base.x,base.y);ctx.lineTo(base.x+base.w,base.y);ctx.lineTo(base.x+base.w,GROUND);ctx.stroke();
   ctx.beginPath();ctx.moveTo(base.x+10,base.y);ctx.lineTo(base.x+10,base.y-14);ctx.stroke();
   ctx.beginPath();ctx.moveTo(base.x+base.w-10,base.y);ctx.lineTo(base.x+base.w-10,base.y-14);ctx.stroke();
   ctx.fillStyle=color;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
   ctx.fillText(label,base.x+base.w/2,base.y-17);
   var img=charId?getSVGImg(charId):null;
-  if(img){
-    ctx.globalAlpha=0.3;
-    ctx.drawImage(img,base.x+6,base.y+4,base.w-12,base.h-10);
-    ctx.globalAlpha=1;
-  }
+  if(img){ctx.globalAlpha=0.3;ctx.drawImage(img,base.x+6,base.y+4,base.w-12,base.h-10);ctx.globalAlpha=1;}
   if(stealState.active&&((isBot&&stealState.carrier===1)||(!isBot&&stealState.carrier===0))){
-    ctx.globalAlpha=0.2+0.2*Math.sin(Date.now()/100);
-    ctx.fillStyle='#ffcc00';
-    ctx.fillRect(base.x,base.y,base.w,GROUND-base.y);
-    ctx.globalAlpha=1;
+    ctx.globalAlpha=0.2+0.2*Math.sin(Date.now()/100);ctx.fillStyle='#ffcc00';
+    ctx.fillRect(base.x,base.y,base.w,GROUND-base.y);ctx.globalAlpha=1;
   }
   ctx.restore();
 }
 
 function hexToRgb(hex){
-  var r=parseInt(hex.slice(1,3),16);
-  var g=parseInt(hex.slice(3,5),16);
-  var b=parseInt(hex.slice(5,7),16);
+  var r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
   return r+','+g+','+b;
 }
 
 function render(){
-  ctx.clearRect(0,0,W,H);
-  ctx.fillStyle='#0a0a18';ctx.fillRect(0,0,W,H);
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#0a0a18';ctx.fillRect(0,0,W,H);
   ctx.fillStyle='rgba(255,255,255,0.22)';
   for(var i=0;i<30;i++){var sx=(i*137+11)%W,sy=(i*53+7)%(GROUND-10);ctx.fillRect(sx,sy,1,1);}
   ctx.fillStyle='#181830';ctx.fillRect(0,GROUND,W,H-GROUND);
   ctx.strokeStyle='#2a2a60';ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(0,GROUND);ctx.lineTo(W,GROUND);ctx.stroke();
-  drawBase(BASE.bot, players[0]?players[0].color:'#888','🤖基地',players[0]?players[0].charId:null,true);
+  drawBase(BASE.bot,players[0]?players[0].color:'#888','🤖基地',players[0]?players[0].charId:null,true);
   drawBase(BASE.player,players[1]?players[1].color:'#00ffcc','🎮基地',players[1]?players[1].charId:null,false);
   particles.forEach(function(pt){
     ctx.save();ctx.fillStyle=pt.color;ctx.globalAlpha=pt.life/24;
@@ -763,11 +855,7 @@ function render(){
   players.forEach(function(p){drawCharSVG(p);});
 }
 
-function loop(){
-  if(!gameRunning)return;
-  update();render();
-  animFrameId=requestAnimationFrame(loop);
-}
+function loop(){if(!gameRunning)return;update();render();animFrameId=requestAnimationFrame(loop);}
 
 try{initSelect();}catch(e){console.error(e);}
 </script>
