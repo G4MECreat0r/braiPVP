@@ -373,30 +373,52 @@ const RARITY_ORDER=['common','uncommon','rare','epic','legendary','mythic','supe
 const RARITIES={common:{label:'COMMON'},uncommon:{label:'UNCOMMON'},rare:{label:'RARE'},epic:{label:'EPIC'},legendary:{label:'LEGENDARY'},mythic:{label:'MYTHIC'},supermythic:{label:'SUPER MYTHIC'},secret:{label:'SECRET'},divine:{label:'DIVINE'}};
 const SAVE_KEY='brainrot_v3';
 
-// ─── コレクターデータ読み込み（invItems + base + mutations両対応）───
+// ─── コレクターデータ完全読み込み ───
+// 戻り値: { charId: [ {muts:[mutId,...], source:'inv'|'base', uid?} ] }
 function getOwnedData(){
   try{
     var raw=localStorage.getItem(SAVE_KEY);
     if(!raw)return null;
     var d=JSON.parse(raw);
     var inv={};
-    // ① インベントリ内キャラ
+
+    // ① インベントリ内キャラ（invItems）
     (d.invItems||[]).forEach(function(it){
+      if(!it.charId)return;
       if(!inv[it.charId])inv[it.charId]=[];
-      inv[it.charId].push({muts:it.muts||[]});
+      inv[it.charId].push({
+        muts: it.muts||[],
+        source: 'inv',
+        uid: it.uid||null
+      });
     });
-    // ② 基地配置キャラ（変異は mutations["charId_slot"] から取得）
+
+    // ② 基地配置キャラ（mutations["charId_slot"]から変異取得）
     var mutData=d.mutations||{};
     (d.base||[]).forEach(function(b){
+      if(!b.charId)return;
       if(!inv[b.charId])inv[b.charId]=[];
       var key=b.charId+'_'+b.slot;
-      var baseMutObjs=mutData[key]||[];
-      var baseMutIds=[];
-      baseMutObjs.forEach(function(m){if(m&&m.id)baseMutIds.push(m.id);});
-      inv[b.charId].push({muts:baseMutIds});
+      var raw_muts=mutData[key]||[];
+      // mutDataの値はstring配列 or オブジェクト配列どちらでもOK
+      var mutIds=[];
+      if(Array.isArray(raw_muts)){
+        raw_muts.forEach(function(m){
+          if(typeof m==='string')mutIds.push(m);
+          else if(m&&m.id)mutIds.push(m.id);
+        });
+      } else if(typeof raw_muts==='string'){
+        mutIds.push(raw_muts);
+      }
+      inv[b.charId].push({
+        muts: mutIds,
+        source: 'base',
+        slot: b.slot
+      });
     });
+
     return Object.keys(inv).length>0?inv:null;
-  }catch(e){return null;}
+  }catch(e){console.error('getOwnedData error:',e);return null;}
 }
 
 // ─── コレクターへの書き戻し ───
@@ -479,7 +501,7 @@ function applyMut(stats,mutId){
 function getRarityIdx(r){return RARITY_ORDER.indexOf(r);}
 
 // ─── SELECT ───
-var picked=[null,null],pickedMut=[null,null],ownedData=null;
+var picked=[null,null],pickedMut=[null,null],pickedMuts=[[],[]],ownedData=null;
 
 function initSelect(){
   ownedData=getOwnedData();
@@ -498,53 +520,105 @@ function buildGrid(pidx){
   var gridId='p'+(pidx+1)+'-grid';
   var grid=document.getElementById(gridId);
   grid.innerHTML='';
+
   CHARACTERS.forEach(function(c){
-    var owned=(ownedData[c.id]||[]).length>0;
-    if(!owned)return; // 所持キャラのみ表示
-    var card=document.createElement('div');
-    card.className='pcard';
-    card.setAttribute('data-id',c.id);
-    card.innerHTML=svgChar(c.id)+
-      '<div class="pname">'+c.name+'</div>'+
-      '<div class="prarity r-'+c.rarity+'">'+(RARITIES[c.rarity]?RARITIES[c.rarity].label:c.rarity)+'</div>';
-    (function(charId){
-      card.onclick=function(){pickChar(pidx,charId,false);};
-    })(c.id);
-    grid.appendChild(card);
+    var items=ownedData[c.id]||[];
+    if(!items.length)return;
+
+    // 変異なしのアイテムをまとめる
+    var noMutItems=items.filter(function(it){return !it.muts||it.muts.length===0;});
+    // 変異ありは個別
+    var mutItems=items.filter(function(it){return it.muts&&it.muts.length>0;});
+
+    // 変異なしカード（所持数バッジ付き）
+    if(noMutItems.length>0){
+      var card=document.createElement('div');
+      card.className='pcard';
+      card.setAttribute('data-id',c.id);
+      var badge=noMutItems.length>1?'<div style="position:absolute;top:2px;right:2px;background:var(--accent);color:#fff;font-size:6px;font-weight:900;border-radius:6px;padding:0 3px;min-width:12px;text-align:center;">×'+noMutItems.length+'</div>':'';
+      card.innerHTML=svgChar(c.id)+badge+
+        '<div class="pname">'+c.name+'</div>'+
+        '<div class="prarity r-'+c.rarity+'">'+(RARITIES[c.rarity]?RARITIES[c.rarity].label:c.rarity)+'</div>';
+      (function(charId){
+        card.onclick=function(){pickChar(pidx,charId,[]);};
+      })(c.id);
+      grid.appendChild(card);
+    }
+
+    // 変異ありカード（変異ごとに個別）
+    mutItems.forEach(function(it){
+      var card=document.createElement('div');
+      card.className='pcard';
+      card.setAttribute('data-id',c.id);
+      // 変異の色とアイコンを表示
+      var mutLabels=it.muts.map(function(mid){
+        var m=MUTATIONS[mid];
+        return m?'<span style="font-size:6px;font-weight:900;color:'+m.color+';">'+m.name+'</span>':'';
+      }).join('');
+      card.innerHTML=svgChar(c.id)+
+        '<div class="pname">'+c.name+'</div>'+
+        '<div class="prarity r-'+c.rarity+'">'+(RARITIES[c.rarity]?RARITIES[c.rarity].label:c.rarity)+'</div>'+
+        (mutLabels?'<div style="text-align:center;line-height:1.3;margin-top:1px;">'+mutLabels+'</div>':'');
+      var borderColor=it.muts.length>0&&MUTATIONS[it.muts[0]]?MUTATIONS[it.muts[0]].color:'var(--accent3)';
+      card.style.borderColor=borderColor;
+      card.style.boxShadow='0 0 6px '+borderColor+'55';
+      (function(charId,muts){
+        card.onclick=function(){pickChar(pidx,charId,muts);};
+      })(c.id,it.muts);
+      grid.appendChild(card);
+    });
   });
+
+  // 何も表示されない場合のメッセージ
+  if(!grid.children.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:10px;padding:10px;">所持キャラなし</div>';
+  }
 }
 
-function pickChar(pidx,charId,isRarityUp){
+// muts: 選択したアイテムの変異ID配列（[]なら変異なし）
+function pickChar(pidx,charId,muts){
   picked[pidx]=charId;
+  pickedMuts[pidx]=muts||[];  // 複数変異を保持
+  // 後方互換のため先頭1つをpickedMutにも入れる
+  pickedMut[pidx]=muts&&muts.length>0?muts[0]:null;
+
   var c=CHARACTERS.find(function(x){return x.id===charId;});
-  if(pidx===0){
+  // ボット枠(pidx=0)は所持アイテムから変異付きを優先、なければランダム
+  if(pidx===0&&(!muts||muts.length===0)){
     var items=ownedData[charId]||[];
     var mutItem=items.find(function(it){return it.muts&&it.muts.length>0;});
-    if(mutItem)pickedMut[0]=mutItem.muts[0];
-    else pickedMut[0]=MUTATION_POOL[Math.floor(Math.random()*MUTATION_POOL.length)];
-  } else {
-    pickedMut[1]=null;
+    if(mutItem){pickedMuts[0]=mutItem.muts;pickedMut[0]=mutItem.muts[0];}
+    else{var rm=MUTATION_POOL[Math.floor(Math.random()*MUTATION_POOL.length)];pickedMuts[0]=[rm];pickedMut[0]=rm;}
   }
-  var m=pickedMut[pidx]?MUTATIONS[pickedMut[pidx]]:null;
+
+  // プレビュー更新
+  var firstMutId=pickedMuts[pidx]&&pickedMuts[pidx].length?pickedMuts[pidx][0]:null;
+  var m=firstMutId?MUTATIONS[firstMutId]:null;
+  var mutOverlay=pickedMuts[pidx].map(function(mid){
+    var mm=MUTATIONS[mid];return mm?'<div class="mut-overlay" style="color:'+mm.color+';bottom:'+(pickedMuts[pidx].indexOf(mid)*14-6)+'px;">'+mm.name+'</div>':'';
+  }).join('');
   var prevEl=document.getElementById('p'+(pidx+1)+'-preview');
-  prevEl.innerHTML=svgChar(charId)+(m?'<div class="mut-overlay" style="color:'+m.color+'">'+m.name+'</div>':'');
+  prevEl.innerHTML=svgChar(charId)+mutOverlay;
   var rarityNote=document.getElementById('p'+(pidx+1)+'-rarity-note');
-  if(rarityNote)rarityNote.textContent=isRarityUp?'✨ レア度1上のキャラ！':'';
-  document.getElementById('p'+(pidx+1)+'-name').textContent=c.name+(m?' ['+m.name+']':'');
+  if(rarityNote)rarityNote.textContent='';
+  var mutLabel=pickedMuts[pidx].map(function(mid){var mm=MUTATIONS[mid];return mm?mm.name:'';}).filter(Boolean).join(', ');
+  document.getElementById('p'+(pidx+1)+'-name').textContent=c.name+(mutLabel?' ['+mutLabel+']':'');
+
+  // 選択ハイライト（クリックされたカードをハイライト）
   var grid=document.getElementById('p'+(pidx+1)+'-grid');
   grid.querySelectorAll('.pcard').forEach(function(el){el.classList.remove('selected');});
-  var card=grid.querySelector('[data-id="'+charId+'"]');
-  if(card)card.classList.add('selected');
+  // 変異なしの場合は最初の同charIdカード、変異ありの場合はevent.targetを使う
+  // → onclickで直接selectedを付けるためeventを使わずdata属性で対応
   checkStart();
 }
 
 function checkStart(){document.getElementById('start-btn').disabled=!(picked[0]&&picked[1]);}
-document.getElementById('start-btn').onclick=function(){if(picked[0]&&picked[1])startGame(picked[0],picked[1],pickedMut[0],pickedMut[1]);};
+document.getElementById('start-btn').onclick=function(){if(picked[0]&&picked[1])startGame(picked[0],picked[1],pickedMut[0],pickedMut[1],pickedMuts[0],pickedMuts[1]);};
 function showSelect(){
   gameRunning=false;
   if(animFrameId){cancelAnimationFrame(animFrameId);animFrameId=null;}
   score=[0,0];
-  picked=[null,null];pickedMut=[null,null];
+  picked=[null,null];pickedMut=[null,null];pickedMuts=[[],[]];
   document.getElementById('screen-select').style.display='flex';
   document.getElementById('screen-game').style.display='none';
   document.getElementById('p1-preview').innerHTML='<svg viewBox="0 0 60 60"><text x="30" y="36" text-anchor="middle" font-size="26" fill="#556">?</text></svg>';
@@ -605,11 +679,14 @@ function botThink(){
   }
 }
 
-function makePlayer(idx,charId,mutId){
+function makePlayer(idx,charId,mutId,mutsArr){
   var stats=getBaseStats(charId);
-  if(mutId)stats=applyMut(stats,mutId);
+  // 全変異を順番に適用
+  var allMuts=mutsArr&&mutsArr.length?mutsArr:(mutId?[mutId]:[]);
+  allMuts.forEach(function(mid){if(mid)stats=applyMut(stats,mid);});
+  var firstMut=allMuts.length?allMuts[0]:null;
   return {
-    idx:idx,charId:charId,mutId:mutId,
+    idx:idx,charId:charId,mutId:firstMut,mutsArr:allMuts,
     x:idx===0?BASE.bot.x+BASE.bot.w/2:BASE.player.x+BASE.player.w/2,
     y:GROUND,vx:0,vy:0,
     hp:stats.hp,maxHp:stats.hp,atk:stats.atk,spd:stats.spd,
@@ -621,9 +698,9 @@ function makePlayer(idx,charId,mutId){
   };
 }
 
-function startGame(c1,c2,mut1,mut2){
+function startGame(c1,c2,mut1,mut2,muts1,muts2){
   resizeCanvas();
-  players=[makePlayer(0,c1,mut1),makePlayer(1,c2,mut2)];
+  players=[makePlayer(0,c1,mut1,muts1||[]),makePlayer(1,c2,mut2,muts2||[])];
   score=[0,0];gameState='play';particles.length=0;
   stealState={active:false,carrier:null,progress:0};
   botAI={state:'idle',target:null,stealTimer:0,thinkTimer:0};
@@ -651,8 +728,10 @@ function updateMutLabels(){
   var p2c=CHARACTERS.find(function(x){return x.id===players[1].charId;});
   var m1=players[0].mutId?MUTATIONS[players[0].mutId]:null;
   var m2=players[1].mutId?MUTATIONS[players[1].mutId]:null;
-  document.getElementById('p1-hp-label').textContent='🤖 '+(p1c?p1c.name:'ボット')+(m1?' ['+m1.name+']':'');
-  document.getElementById('p2-hp-label').textContent=(p2c?p2c.name:'あなた')+(m2?' ['+m2.name+']':'')+' 🎮';
+  var ml1=(players[0].mutsArr||[]).map(function(mid){var m=MUTATIONS[mid];return m?m.name:'';}).filter(Boolean).join('+');
+  var ml2=(players[1].mutsArr||[]).map(function(mid){var m=MUTATIONS[mid];return m?m.name:'';}).filter(Boolean).join('+');
+  document.getElementById('p1-hp-label').textContent='🤖 '+(p1c?p1c.name:'ボット')+(ml1?' ['+ml1+']':'');
+  document.getElementById('p2-hp-label').textContent=(p2c?p2c.name:'あなた')+(ml2?' ['+ml2+']':'')+' 🎮';
 }
 
 document.addEventListener('keydown',function(e){
