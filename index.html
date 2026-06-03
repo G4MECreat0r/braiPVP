@@ -404,14 +404,23 @@ function addCharToCollector(charId,muts){
     var raw=localStorage.getItem(SAVE_KEY);
     if(!raw){showCollectorNote('⚠️ コレクターデータなし（反映スキップ）');return;}
     var d=JSON.parse(raw);
+    // invItems が必須 — コレクターのsaveGame()と完全に同じ構造で保持
     if(!d.invItems)d.invItems=[];
     if(!d.discovered)d.discovered=[];
-    var uid='fighter_'+(Date.now()%1e9)+'_'+Math.floor(Math.random()*9999);
-    d.invItems.push({uid:uid,charId:charId,muts:muts||[]});
     if(!d.inventory)d.inventory={};
-    d.inventory[charId]=(d.inventory[charId]||0)+1;
+    if(!d.stats)d.stats={totalBuys:0,totalTrades:0,totalEarned:0,totalFusions:0,sessionDiscovers:0};
+    // uid生成（コレクターのgenUid()と同形式）
+    var uid='u'+(Date.now()%1e9)+'_'+Math.floor(Math.random()*9999);
+    // invItemsに追加
+    d.invItems.push({uid:uid,charId:charId,muts:muts||[]});
+    // inventory(hash)を再計算（syncInventoryHash相当）
+    d.inventory={};
+    d.invItems.forEach(function(it){d.inventory[it.charId]=(d.inventory[it.charId]||0)+1;});
+    // base配置キャラも inventory に反映
+    (d.base||[]).forEach(function(b){d.inventory[b.charId]=(d.inventory[b.charId]||0)+1;});
+    // discovered に追加
     if(d.discovered.indexOf(charId)<0)d.discovered.push(charId);
-    if(!d.stats)d.stats={};
+    // stats更新
     d.stats.sessionDiscovers=(d.stats.sessionDiscovers||0)+1;
     localStorage.setItem(SAVE_KEY,JSON.stringify(d));
     var c=CHARACTERS.find(function(x){return x.id===charId;});
