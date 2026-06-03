@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>🥊 ブレインロット ファイター</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Zen+Dots&family=M+PLUS+Rounded+1c:wght@400;700;900&display=swap');
+:root{
+  --bg:#0d0d1a;--panel:#13132a;--card:#1a1a35;--border:#2a2a50;
+  --accent:#ff3366;--accent2:#00ffcc;--accent3:#ffcc00;
+  --text:#e0e0ff;--muted:#6060aa;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'M PLUS Rounded 1c',sans-serif;overflow:hidden;height:100dvh;width:100vw;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#screen-select,#screen-game{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+#screen-game{display:none}
+
+/* ── SELECT ── */
+.title{font-family:'Zen Dots',sans-serif;font-size:clamp(14px,3.5vw,24px);color:var(--accent3);text-align:center;margin-bottom:2px}
+.subtitle{font-size:10px;color:var(--muted);text-align:center;margin-bottom:10px}
+.vs-row{display:flex;gap:8px;align-items:flex-start;justify-content:center;width:100%;max-width:500px;padding:0 8px}
+.player-pick{background:var(--panel);border:2px solid var(--border);border-radius:12px;padding:8px;flex:1;min-width:130px;max-width:210px}
+.player-label{font-family:'Zen Dots',sans-serif;font-size:10px;margin-bottom:5px;text-align:center}
+.p1-label{color:#888}
+.p2-label{color:#00ffcc}
+.char-preview{width:64px;height:64px;margin:0 auto 4px;display:flex;align-items:center;justify-content:center;position:relative}
+.char-preview svg{width:100%;height:100%}
+.mut-overlay{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:900;white-space:nowrap;padding:1px 4px;border-radius:6px;background:#000c;pointer-events:none}
+.picked-name{font-size:9px;font-weight:700;text-align:center;color:var(--text);margin-bottom:4px;min-height:13px}
+.rarity-up-note{font-size:8px;color:var(--accent3);text-align:center;margin-bottom:4px;min-height:12px}
+.pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;max-height:160px;overflow-y:auto}
+.pick-grid::-webkit-scrollbar{width:3px}
+.pick-grid::-webkit-scrollbar-thumb{background:var(--border)}
+.pcard{background:var(--card);border:1.5px solid var(--border);border-radius:6px;padding:2px;cursor:pointer;transition:.12s;display:flex;flex-direction:column;align-items:center;gap:1px}
+.pcard:hover{border-color:var(--accent2);transform:scale(1.07)}
+.pcard.selected{border-color:var(--accent3);background:#1a1800}
+.pcard.rarity-up{border-color:#8844ff;background:#0a0020}
+.pcard.locked{opacity:0.25;cursor:not-allowed;pointer-events:none}
+.pcard svg{width:32px;height:32px}
+.pcard .pname{font-size:5px;text-align:center;font-weight:700;line-height:1.1;overflow:hidden;max-width:100%}
+.pcard .prarity{font-size:4.5px;font-weight:900}
+.start-btn{margin-top:10px;background:linear-gradient(135deg,var(--accent),#cc0044);color:#fff;border:none;border-radius:10px;padding:10px 32px;font-size:14px;font-weight:900;cursor:pointer;font-family:'M PLUS Rounded 1c',sans-serif;transition:.2s}
+.start-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed}
+.note{font-size:9px;color:var(--muted);text-align:center;margin-top:5px;max-width:360px;line-height:1.4}
+
+/* ── GAME ── */
+canvas{display:block;border-radius:8px;touch-action:none}
+.game-ui{width:100%;max-width:680px;padding:3px 6px 2px;flex-shrink:0}
+.hp-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.hp-wrap{flex:1}
+.hp-label{font-size:9px;color:var(--muted);margin-bottom:2px}
+.hp-bg{height:12px;border-radius:6px;background:#1a1a35;border:1px solid var(--border);overflow:hidden}
+.hp-fill{height:100%;border-radius:6px;transition:width .12s}
+.hp-enemy{background:#888;float:left}
+.hp-player{background:var(--accent2);float:right}
+.center-score{font-family:'Zen Dots',sans-serif;font-size:11px;color:var(--muted);text-align:center;min-width:50px}
+#msg{font-family:'Zen Dots',sans-serif;font-size:clamp(10px,2.5vw,14px);color:var(--accent3);text-align:center;padding:2px 0;min-height:20px;flex-shrink:0}
+.carry-bar-wrap{width:100%;max-width:680px;padding:0 6px;flex-shrink:0}
+.carry-bar-bg{height:8px;border-radius:4px;background:#1a1a35;border:1px solid var(--border);overflow:hidden;margin-bottom:2px}
+.carry-bar-fill{height:100%;border-radius:4px;background:var(--accent3);transition:width .1s}
+.carry-label{font-size:8px;color:var(--muted);text-align:center}
+
+/* コレクター連携ノート */
+#collector-note{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:1.5px solid var(--accent2);border-radius:10px;padding:7px 16px;font-size:11px;font-weight:700;color:var(--accent2);z-index:999;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;}
+
+/* mobile buttons */
+.mobile-btns{display:flex;justify-content:flex-end;padding:3px 6px 0;gap:4px;width:100%;max-width:680px;flex-shrink:0}
+.mb-group{display:flex;gap:3px;align-items:center}
+.mb-btn{background:var(--card);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-size:11px;font-weight:900;width:44px;height:44px;display:flex;align-items:center;justify-content:center;user-select:none;touch-action:none;cursor:pointer}
+.mb-attack{background:#ff336633;border-color:var(--accent);color:var(--accent);font-size:15px}
+.back-btn{background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:4px 10px;font-size:9px;cursor:pointer;font-family:'M PLUS Rounded 1c',sans-serif}
+.back-btn:hover{color:var(--text);border-color:var(--accent2)}
+
+.r-common{color:#8888aa}.r-uncommon{color:#44cc44}.r-rare{color:#4488ff}
+.r-epic{color:#cc44ff}.r-legendary{color:#ffaa00}
+.r-mythic,.r-supermythic,.r-secret,.r-divine{color:#ff3366}
+</style>
+</head>
+<body>
+
+<div id="collector-note"></div>
+
+<!-- SELECT SCREEN -->
+<div id="screen-select">
+  <div class="title">🥊 BRAINROT FIGHTER</div>
+  <div class="subtitle">キャラを選んで戦え！ボットから敵キャラを奪え！</div>
+  <div class="vs-row">
+    <div class="player-pick">
+      <div class="player-label p1-label">🤖 ボット (自動)</div>
+      <div class="char-preview" id="p1-preview"><svg viewBox="0 0 60 60"><text x="30" y="36" text-anchor="middle" font-size="26" fill="#556">?</text></svg></div>
+      <div class="picked-name" id="p1-name">未選択</div>
+      <div class="rarity-up-note" id="p1-rarity-note"></div>
+      <div class="pick-grid" id="p1-grid"></div>
+    </div>
+    <div class="player-pick">
+      <div class="player-label p2-label">🎮 あなた</div>
+      <div class="char-preview" id="p2-preview"><svg viewBox="0 0 60 60"><text x="30" y="36" text-anchor="middle" font-size="26" fill="#556">?</text></svg></div>
+      <div class="picked-name" id="p2-name">未選択</div>
+      <div class="rarity-up-note" id="p2-rarity-note"></div>
+      <div class="pick-grid" id="p2-grid"></div>
+    </div>
+  </div>
+  <button class="start-btn" id="start-btn" disabled>キャラを選んで開始！</button>
+  <div class="note" id="save-note"></div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="screen-game">
+  <div class="game-ui">
+    <div class="hp-row">
+      <div class="hp-wrap">
+        <div class="hp-label" id="p1-hp-label">🤖 ボット</div>
+        <div class="hp-bg"><div class="hp-fill hp-enemy" id="hp1-bar" style="width:100%"></div></div>
+      </div>
+      <div class="center-score" id="score-text">0 - 0</div>
+      <div class="hp-wrap">
+        <div class="hp-label" style="text-align:right" id="p2-hp-label">あなた 🎮</div>
+        <div class="hp-bg"><div class="hp-fill hp-player" id="hp2-bar" style="width:100%;float:right"></div></div>
+      </div>
+    </div>
+  </div>
+  <div id="msg">🥊 ファイト！</div>
+  <canvas id="game-canvas"></canvas>
+  <div class="carry-bar-wrap" id="carry-bar-wrap" style="display:none">
+    <div class="carry-bar-bg"><div class="carry-bar-fill" id="carry-bar" style="width:0%"></div></div>
+    <div class="carry-label" id="carry-label">キャラを運んでいる…</div>
+  </div>
+  <div class="mobile-btns">
+    <div class="mb-group">
+      <button class="back-btn" id="back-btn">↩</button>
+      <button class="mb-btn" id="btn-l">◀</button>
+      <button class="mb-btn" id="btn-u">▲</button>
+      <button class="mb-btn" id="btn-r">▶</button>
+      <button class="mb-btn mb-attack" id="btn-a">👊</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ★ SVGS と CHARACTERS はコレクター(index.html)と同じものをここに貼り付けてください
+// 例: const SVGS = { tralalero: `<svg...>`, ... };
+// 例: const CHARACTERS = [ {id:'tralalero', name:'トラ・ラ・レロ', rarity:'common', rate:5, desc:'...'}, ... ];
+// ↓ 以下は動作確認用のミニマルサンプル（本番では全キャラに差し替え）
+const SVGS = {};
+const CHARACTERS = [];
+// ★ここまでを差し替え
+
+const MUTATIONS={
+  blaze:  {id:'blaze',  name:'🔥炎熱', color:'#ff4400',atkMult:3.0,hpMult:1.0,spdMult:1.0},
+  frost:  {id:'frost',  name:'❄️氷結', color:'#44ccff',atkMult:1.0,hpMult:2.5,spdMult:0.9},
+  thunder:{id:'thunder',name:'⚡雷電', color:'#ffdd00',atkMult:2.8,hpMult:1.0,spdMult:1.3},
+  shadow: {id:'shadow', name:'🌑暗黒', color:'#8844ff',atkMult:3.5,hpMult:1.2,spdMult:1.1},
+  cosmic: {id:'cosmic', name:'🌌宇宙', color:'#ff3366',atkMult:5.0,hpMult:2.0,spdMult:1.5},
+  titan:  {id:'titan',  name:'💪巨人', color:'#ff8800',atkMult:4.0,hpMult:3.0,spdMult:0.8},
+  void:   {id:'void',   name:'🕳虚空', color:'#aa44ff',atkMult:6.0,hpMult:1.5,spdMult:1.8},
+  rainbow:{id:'rainbow',name:'🌈虹色', color:'#ff88cc',atkMult:2.0,hpMult:2.0,spdMult:2.0},
+  curse:  {id:'curse',  name:'💀呪い', color:'#8b0000',atkMult:6.5,hpMult:0.8,spdMult:1.4},
+  yinyang:{id:'yinyang',name:'☯陰陽',  color:'#e0e0e0',atkMult:7.0,hpMult:1.0,spdMult:1.0},
+};
+const MUTATION_POOL=Object.keys(MUTATIONS);
+const RARITY_ORDER=['common','uncommon','rare','epic','legendary','mythic','supermythic','secret','divine'];
+const RARITIES={common:{label:'COMMON'},uncommon:{label:'UNCOMMON'},rare:{label:'RARE'},epic:{label:'EPIC'},legendary:{label:'LEGENDARY'},mythic:{label:'MYTHIC'},supermythic:{label:'SUPER MYTHIC'},secret:{label:'SECRET'},divine:{label:'DIVINE'}};
+const SAVE_KEY='brainrot_v3';
+
+function svgChar(id){
+  var d=SVGS[id];
+  return d||'<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="20" fill="#556"/><text x="30" y="36" text-anchor="middle" font-size="14" fill="#fff">?</text></svg>';
+}
+
+// ─── 【修正①】コレクターのセーブデータ読み込み ───
+// invItems（インベントリ）と base（基地配置）の両方を読む
+// 基地上の変異は mutations["charId_slot"] = [{id,...},...] 形式で保存されている
+function getOwnedData(){
+  try{
+    var raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return null;
+    var d=JSON.parse(raw);
+    var inv={};
+
+    // インベントリ内キャラ
+    (d.invItems||[]).forEach(function(it){
+      if(!inv[it.charId])inv[it.charId]=[];
+      inv[it.charId].push({muts:it.muts||[]});
+    });
+
+    // 基地に配置されているキャラ（変異情報もdecode）
+    var mutData=d.mutations||{};
+    (d.base||[]).forEach(function(b){
+      if(!inv[b.charId])inv[b.charId]=[];
+      var key=b.charId+'_'+b.slot;
+      var baseMutObjs=mutData[key]||[];
+      var baseMutIds=[];
+      baseMutObjs.forEach(function(m){ if(m&&m.id)baseMutIds.push(m.id); });
+      inv[b.charId].push({muts:baseMutIds});
+    });
+
+    return Object.keys(inv).length>0?inv:null;
+  }catch(e){return null;}
+}
+
+// ─── 【修正②】コレクターへの反映 ───
+// 奪取成功：ボットのキャラをコレクターのinvItemsに追加
+function addCharToCollector(charId, muts){
+  try{
+    var raw=localStorage.getItem(SAVE_KEY);
+    if(!raw){ showCollectorNote('⚠️ コレクターデータなし（反映スキップ）'); return; }
+    var d=JSON.parse(raw);
+    if(!d.invItems)d.invItems=[];
+    if(!d.discovered)d.discovered=[];
+    var uid='fighter_'+(Date.now()%1e9)+'_'+Math.floor(Math.random()*9999);
+    d.invItems.push({uid:uid, charId:charId, muts:muts||[]});
+    if(!d.inventory)d.inventory={};
+    d.inventory[charId]=(d.inventory[charId]||0)+1;
+    if(d.discovered.indexOf(charId)<0)d.discovered.push(charId);
+    if(!d.stats)d.stats={};
+    d.stats.sessionDiscovers=(d.stats.sessionDiscovers||0)+1;
+    localStorage.setItem(SAVE_KEY,JSON.stringify(d));
+    var c=CHARACTERS.find(function(x){return x.id===charId;});
+    showCollectorNote('✅ '+(c?c.name:charId)+' をコレクターに追加！');
+  }catch(e){ showCollectorNote('❌ コレクター反映失敗: '+e.message); }
+}
+
+// 奪取失敗（ボットに奪われた）：プレイヤーのキャラをinvItemsから1個削除
+function removeCharFromCollector(charId){
+  try{
+    var raw=localStorage.getItem(SAVE_KEY);
+    if(!raw)return;
+    var d=JSON.parse(raw);
+    if(!d.invItems||!d.invItems.length)return;
+    // 変異なし優先で1個削除
+    var idx=-1;
+    for(var i=0;i<d.invItems.length;i++){
+      if(d.invItems[i].charId===charId&&(!d.invItems[i].muts||!d.invItems[i].muts.length)){
+        idx=i;break;
+      }
+    }
+    if(idx<0){
+      for(var i=0;i<d.invItems.length;i++){
+        if(d.invItems[i].charId===charId){idx=i;break;}
+      }
+    }
+    if(idx>=0){
+      d.invItems.splice(idx,1);
+      if(d.inventory&&d.inventory[charId]>0)d.inventory[charId]--;
+      localStorage.setItem(SAVE_KEY,JSON.stringify(d));
+      var c=CHARACTERS.find(function(x){return x.id===charId;});
+      showCollectorNote('💀 '+(c?c.name:charId)+' がボットに奪われた…コレクターから消えた！');
+    }
+  }catch(e){}
+}
+
+var _collectorNoteTimer=null;
+function showCollectorNote(msg){
+  var el=document.getElementById('collector-note');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.opacity='1';
+  clearTimeout(_collectorNoteTimer);
+  _collectorNoteTimer=setTimeout(function(){el.style.opacity='0';},4000);
+}
+
+// ─── STATS ───
+const RARITY_STATS={
+  common:   {hp:100,atk:8, spd:3.8},
+  uncommon: {hp:120,atk:10,spd:4.0},
+  rare:     {hp:145,atk:13,spd:4.3},
+  epic:     {hp:175,atk:17,spd:4.6},
+  legendary:{hp:210,atk:22,spd:5.0},
+  mythic:   {hp:260,atk:30,spd:5.3},
+  supermythic:{hp:320,atk:40,spd:5.6},
+  secret:   {hp:400,atk:55,spd:6.0},
+  divine:   {hp:500,atk:70,spd:6.4},
+};
+function getBaseStats(charId){
+  var c=CHARACTERS.find(function(x){return x.id===charId;});
+  var r=c?c.rarity:'common';
+  var s=RARITY_STATS[r]||RARITY_STATS.common;
+  return {hp:s.hp,atk:s.atk,spd:s.spd};
+}
+function applyMut(stats,mutId){
+  var m=MUTATIONS[mutId];
+  if(!m)return stats;
+  return {hp:Math.round(stats.hp*(m.hpMult||1)),atk:Math.round(stats.atk*(m.atkMult||1)),spd:+(stats.spd*(m.spdMult||1)).toFixed(2)};
+}
+function getRarityIdx(r){return RARITY_ORDER.indexOf(r);}
+
+// ─── SELECT SCREEN ───
+var picked=[null,null], pickedMut=[null,null];
+var ownedData=null;
+
+function initSelect(){
+  ownedData=getOwnedData();
+  var note=document.getElementById('save-note');
+  if(!ownedData){
+    note.textContent='⚠️ コレクターのセーブデータが見つかりません。全キャラ使用可。';
+    ownedData={};
+    CHARACTERS.forEach(function(c){ownedData[c.id]=[{muts:[]}];});
+  } else {
+    note.innerHTML='✅ コレクターデータ読み込み完了<br>所持キャラ＋レア度1個上まで選択可。';
+  }
+  buildGrid(0);
+  buildGrid(1);
+}
+
+function buildGrid(pidx){
+  var gridId='p'+(pidx+1)+'-grid';
+  var grid=document.getElementById(gridId);
+  grid.innerHTML='';
+  CHARACTERS.forEach(function(c){
+    var owned=(ownedData[c.id]||[]).length>0;
+    var rarityUpOk=false;
+    if(!owned){
+      var thisIdx=getRarityIdx(c.rarity);
+      if(thisIdx>0){
+        var lowerRarity=RARITY_ORDER[thisIdx-1];
+        rarityUpOk=CHARACTERS.some(function(other){
+          return other.rarity===lowerRarity&&(ownedData[other.id]||[]).length>0;
+        });
+      }
+    }
+    var selectable=owned||rarityUpOk;
+    var card=document.createElement('div');
+    card.className='pcard'+(selectable?(rarityUpOk&&!owned?' rarity-up':''):' locked');
+    card.setAttribute('data-id',c.id);
+    card.innerHTML=svgChar(c.id)+
+      '<div class="pname">'+c.name+'</div>'+
+      '<div class="prarity r-'+c.rarity+'">'+(RARITIES[c.rarity]?RARITIES[c.rarity].label:c.rarity)+'</div>';
+    if(selectable){
+      (function(charId,isRarityUp){
+        card.onclick=function(){pickChar(pidx,charId,isRarityUp);};
+      })(c.id,rarityUpOk&&!owned);
+    }
+    grid.appendChild(card);
+  });
+}
+
+function pickChar(pidx,charId,isRarityUp){
+  picked[pidx]=charId;
+  var c=CHARACTERS.find(function(x){return x.id===charId;});
+  if(pidx===0){
+    var items=ownedData[charId]||[];
+    var mutItem=items.find(function(it){return it.muts&&it.muts.length>0;});
+    if(mutItem) pickedMut[0]=mutItem.muts[0];
+    else pickedMut[0]=MUTATION_POOL[Math.floor(Math.random()*MUTATION_POOL.length)];
+  } else {
+    pickedMut[1]=null;
+  }
+  var m=pickedMut[pidx]?MUTATIONS[pickedMut[pidx]]:null;
+  var prevEl=document.getElementById('p'+(pidx+1)+'-preview');
+  prevEl.innerHTML=svgChar(charId)+(m?'<div class="mut-overlay" style="color:'+m.color+'">'+m.name+'</div>':'');
+  var rarityNote=document.getElementById('p'+(pidx+1)+'-rarity-note');
+  if(rarityNote)rarityNote.textContent=isRarityUp?'✨ レア度1上のキャラ！':'';
+  document.getElementById('p'+(pidx+1)+'-name').textContent=c.name+(m?' ['+m.name+']':'');
+  var grid=document.getElementById('p'+(pidx+1)+'-grid');
+  grid.querySelectorAll('.pcard').forEach(function(el){el.classList.remove('selected');});
+  var card=grid.querySelector('[data-id="'+charId+'"]');
+  if(card)card.classList.add('selected');
+  checkStart();
+}
+
+function checkStart(){
+  document.getElementById('start-btn').disabled=!(picked[0]&&picked[1]);
+}
+document.getElementById('start-btn').onclick=function(){
+  if(picked[0]&&picked[1])startGame(picked[0],picked[1],pickedMut[0],pickedMut[1]);
+};
+function showSelect(){
+  gameRunning=false;
+  document.getElementById('screen-select').style.display='flex';
+  document.getElementById('screen-game').style.display='none';
+  // セレクト画面に戻ったらデータを再読み込み
+  initSelect();
+}
+
+// ─── GAME ───
+var canvas=document.getElementById('game-canvas');
+var ctx=canvas.getContext('2d');
+var W=0,H=0,GROUND=0;
+var gameRunning=false,animFrameId=null;
+var gameState='play';
+var score=[0,0];
+var particles=[];
+var stealState={active:false,carrier:null,progress:0};
+var BASE={bot:{x:0,y:0,w:80,h:90},player:{x:0,y:0,w:80,h:90}};
+var players=[];
+var botAI={state:'idle',target:null,stealTimer:0,thinkTimer:0};
+
+function botThink(){
+  var bot=players[0],player=players[1];
+  if(!bot||!player)return;
+  var dx=player.x-bot.x;
+  var dist=Math.abs(dx);
+  botAI.thinkTimer++;
+  if(botAI.thinkTimer<8)return;
+  botAI.thinkTimer=0;
+  if(stealState.active&&stealState.carrier===0){
+    var baseCenter=BASE.bot.x+BASE.bot.w/2;
+    bot.keys.left=bot.x>baseCenter+10;
+    bot.keys.right=bot.x<baseCenter-10;
+    bot.keys.attack=false;
+    return;
+  }
+  if(dist<40){
+    bot.keys.left=false;bot.keys.right=false;bot.keys.attack=true;
+    if(Math.random()<0.03&&bot.onGround)bot.keys.up=true;else bot.keys.up=false;
+  } else {
+    bot.keys.attack=false;bot.keys.up=false;
+    if(dx>0){bot.keys.left=false;bot.keys.right=true;}
+    else{bot.keys.left=true;bot.keys.right=false;}
+    if(Math.random()<0.01&&bot.onGround)bot.keys.up=true;
+  }
+  if(bot.hp<bot.maxHp*0.25){
+    var baseCenter=BASE.bot.x+BASE.bot.w/2;
+    bot.keys.right=bot.x<baseCenter;
+    bot.keys.left=bot.x>baseCenter;
+    bot.keys.attack=false;
+  }
+}
+
+function makePlayer(idx,charId,mutId){
+  var stats=getBaseStats(charId);
+  if(mutId)stats=applyMut(stats,mutId);
+  return {
+    idx:idx,charId:charId,mutId:mutId,
+    x:idx===0?BASE.bot.x+BASE.bot.w/2:BASE.player.x+BASE.player.w/2,
+    y:GROUND,vx:0,vy:0,
+    hp:stats.hp,maxHp:stats.hp,atk:stats.atk,spd:stats.spd,
+    dir:idx===0?1:-1,onGround:false,
+    attacking:false,attackTimer:0,hitTimer:0,
+    color:idx===0?'#888888':'#00ffcc',
+    keys:{left:false,right:false,up:false,attack:false},
+    keyMap:idx===0?{}:{left:'arrowleft',right:'arrowright',up:'arrowup',attack:'l'}
+  };
+}
+
+function startGame(c1,c2,mut1,mut2){
+  resizeCanvas();
+  players=[makePlayer(0,c1,mut1),makePlayer(1,c2,mut2)];
+  score=[0,0];gameState='play';particles.length=0;
+  stealState={active:false,carrier:null,progress:0};
+  botAI={state:'idle',target:null,stealTimer:0,thinkTimer:0};
+  document.getElementById('screen-select').style.display='none';
+  document.getElementById('screen-game').style.display='flex';
+  updateMutLabels();updateUI();
+  document.getElementById('msg').textContent='🥊 敵キャラを盗んで自分の基地へ！';
+  gameRunning=true;
+  if(animFrameId)cancelAnimationFrame(animFrameId);
+  loop();
+}
+
+function resizeCanvas(){
+  W=Math.min(window.innerWidth,680);
+  H=Math.min(window.innerHeight-175,300);
+  canvas.width=W;canvas.height=H;
+  canvas.style.width=W+'px';canvas.style.height=H+'px';
+  GROUND=Math.floor(H*0.80);
+  BASE.bot={x:4,y:GROUND-90,w:80,h:90};
+  BASE.player={x:W-84,y:GROUND-90,w:80,h:90};
+}
+
+function updateMutLabels(){
+  var p1c=CHARACTERS.find(function(x){return x.id===players[0].charId;});
+  var p2c=CHARACTERS.find(function(x){return x.id===players[1].charId;});
+  var m1=players[0].mutId?MUTATIONS[players[0].mutId]:null;
+  var m2=players[1].mutId?MUTATIONS[players[1].mutId]:null;
+  document.getElementById('p1-hp-label').textContent='🤖 '+(p1c?p1c.name:'ボット')+(m1?' ['+m1.name+']':'');
+  document.getElementById('p2-hp-label').textContent=(p2c?p2c.name:'あなた')+(m2?' ['+m2.name+']':'')+' 🎮';
+}
+
+document.addEventListener('keydown',function(e){
+  var k=e.key.toLowerCase();
+  if(!players[1])return;
+  var km=players[1].keyMap;
+  if(k===km.left){players[1].keys.left=true;e.preventDefault();}
+  if(k===km.right){players[1].keys.right=true;e.preventDefault();}
+  if(k===km.up){players[1].keys.up=true;e.preventDefault();}
+  if(k===km.attack){players[1].keys.attack=true;e.preventDefault();}
+});
+document.addEventListener('keyup',function(e){
+  var k=e.key.toLowerCase();
+  if(!players[1])return;
+  var km=players[1].keyMap;
+  if(k===km.left)players[1].keys.left=false;
+  if(k===km.right)players[1].keys.right=false;
+  if(k===km.up)players[1].keys.up=false;
+  if(k===km.attack)players[1].keys.attack=false;
+});
+
+[['btn-l','left'],['btn-r','right'],['btn-u','up'],['btn-a','attack']].forEach(function(pair){
+  var el=document.getElementById(pair[0]);
+  if(!el)return;
+  var key=pair[1];
+  el.addEventListener('touchstart',function(e){e.preventDefault();if(players[1])players[1].keys[key]=true;},{passive:false});
+  el.addEventListener('touchend',function(e){e.preventDefault();if(players[1])players[1].keys[key]=false;},{passive:false});
+  el.addEventListener('touchcancel',function(){if(players[1])players[1].keys[key]=false;});
+});
+document.getElementById('back-btn').onclick=showSelect;
+
+var svgCache={};
+function getSVGImg(id){
+  if(svgCache[id]!==undefined)return svgCache[id];
+  svgCache[id]=null;
+  try{
+    var blob=new Blob([svgChar(id)],{type:'image/svg+xml'});
+    var url=URL.createObjectURL(blob);
+    var img=new Image();
+    img.onload=function(){svgCache[id]=img;};
+    img.onerror=function(){svgCache[id]=false;};
+    img.src=url;
+  }catch(ex){svgCache[id]=false;}
+  return null;
+}
+
+function addParticle(x,y,color){
+  for(var i=0;i<7;i++)
+    particles.push({x:x,y:y,vx:(Math.random()-.5)*6,vy:-(Math.random()*5+1),life:24,color:color});
+}
+
+function update(){
+  if(gameState!=='play')return;
+  botThink();
+  players.forEach(function(p,i){
+    var other=players[1-i];
+    if(p.keys.left){p.vx=-p.spd;p.dir=-1;}
+    else if(p.keys.right){p.vx=p.spd;p.dir=1;}
+    else p.vx*=0.72;
+    if(stealState.active&&stealState.carrier===i)p.vx*=0.75;
+    if(p.keys.up&&p.onGround){p.vy=-12.5;p.onGround=false;}
+    p.vy+=0.65;p.x+=p.vx;p.y+=p.vy;
+    if(p.y>=GROUND){p.y=GROUND;p.vy=0;p.onGround=true;}
+    p.x=Math.max(5,Math.min(W-5,p.x));
+    if(p.keys.attack&&!p.attacking&&p.attackTimer<=0){p.attacking=true;p.attackTimer=20;}
+    if(p.attackTimer>0)p.attackTimer--;else p.attacking=false;
+    if(p.attacking&&p.attackTimer>12){
+      var px=p.x+p.dir*28,py=p.y-28;
+      var ox=other.x,oy=other.y-28;
+      if(Math.abs(px-ox)<34&&Math.abs(py-oy)<40&&other.hitTimer<=0){
+        other.hp=Math.max(0,other.hp-p.atk);
+        other.hitTimer=22;other.vx=p.dir*4.5;other.vy=-2.5;
+        addParticle(other.x,other.y-28,other.color);
+        if(stealState.active&&stealState.carrier===1-i){
+          stealState.active=false;stealState.carrier=null;stealState.progress=0;
+          document.getElementById('carry-bar-wrap').style.display='none';
+          addParticle(other.x,other.y,'#ffcc00');
+        }
+        updateUI();
+        if(other.hp<=0){other.hp=0;updateUI();respawnPlayer(1-i);}
+      }
+    }
+    if(p.hitTimer>0)p.hitTimer--;
+  });
+
+  var player=players[1];
+  var bot=players[0];
+  if(player&&bot){
+    if(!stealState.active){
+      if(playerInBase(player,BASE.bot)){
+        stealState.active=true;stealState.carrier=1;stealState.progress=0;
+        document.getElementById('carry-bar-wrap').style.display='block';
+        document.getElementById('msg').textContent='🏃 自分の基地まで運べ！';
+      } else if(playerInBase(bot,BASE.player)&&!stealState.active){
+        stealState.active=true;stealState.carrier=0;stealState.progress=0;
+      }
+    } else {
+      stealState.progress=Math.min(stealState.progress+0.3,100);
+      var carrierPl=players[stealState.carrier];
+      var targetBase=stealState.carrier===1?BASE.player:BASE.bot;
+      if(playerInBase(carrierPl,targetBase)&&stealState.progress>=100){
+        endRound(stealState.carrier,'steal');
+        return;
+      }
+      if(stealState.carrier===1){
+        document.getElementById('carry-bar').style.width=stealState.progress+'%';
+        document.getElementById('carry-label').textContent='キャラを運んでいる… 自分の基地へ！';
+      }
+    }
+  }
+
+  for(var i=particles.length-1;i>=0;i--){
+    var pt=particles[i];
+    pt.x+=pt.vx;pt.y+=pt.vy;pt.vy+=0.3;pt.life--;
+    if(pt.life<=0)particles.splice(i,1);
+  }
+}
+
+function playerInBase(p,base){
+  return p.x>base.x&&p.x<base.x+base.w&&p.y>base.y&&p.y<base.y+base.h+GROUND;
+}
+
+function respawnPlayer(idx){
+  var p=players[idx];
+  var s=getBaseStats(p.charId);
+  if(p.mutId)s=applyMut(s,p.mutId);
+  p.hp=s.hp;p.maxHp=s.hp;
+  p.x=idx===0?BASE.bot.x+BASE.bot.w/2:BASE.player.x+BASE.player.w/2;
+  p.y=GROUND;p.vx=0;p.vy=0;p.attacking=false;p.attackTimer=0;p.hitTimer=0;
+  addParticle(p.x,p.y,p.color);
+  updateUI();
+}
+
+// ─── 【修正③】endRound にコレクター連携を追加 ───
+function endRound(winner,reason){
+  if(gameState!=='play')return;
+  gameState='end';
+  score[winner]++;
+  updateUI();
+  stealState={active:false,carrier:null,progress:0};
+  document.getElementById('carry-bar-wrap').style.display='none';
+
+  var wname=CHARACTERS.find(function(x){return x.id===players[winner].charId;});
+  var msg='';
+
+  if(reason==='steal'){
+    if(winner===1){
+      // プレイヤーがボットのキャラを奪った
+      // ボットキャラ（変異付き）をコレクターに追加
+      var botCharId=players[0].charId;
+      var botMuts=players[0].mutId?[players[0].mutId]:[];
+      addCharToCollector(botCharId, botMuts);
+      msg='🎉 キャラ奪取成功！あなたの勝ち！';
+    } else {
+      // ボットがプレイヤーのキャラを奪った
+      // プレイヤーのキャラをコレクターから削除
+      var playerCharId=players[1].charId;
+      removeCharFromCollector(playerCharId);
+      msg='💀 ボットに奪われた…ボットの勝ち';
+    }
+  } else {
+    msg=(winner===1?'🎉 あなたの勝ち！':'💀 ボットの勝ち…')+(wname?' ('+wname.name+')':'');
+  }
+
+  document.getElementById('msg').textContent=msg+' タップで再戦！';
+  canvas.addEventListener('click',restartRound,{once:true});
+  canvas.addEventListener('touchend',restartRound,{once:true});
+}
+
+function restartRound(){
+  if(gameState!=='end')return;
+  gameState='play';
+  stealState={active:false,carrier:null,progress:0};
+  botAI={state:'idle',target:null,stealTimer:0,thinkTimer:0};
+  document.getElementById('carry-bar-wrap').style.display='none';
+  players.forEach(function(p,i){
+    var s=getBaseStats(p.charId);
+    if(p.mutId)s=applyMut(s,p.mutId);
+    p.hp=s.hp;p.maxHp=s.hp;
+    p.x=i===0?BASE.bot.x+BASE.bot.w/2:BASE.player.x+BASE.player.w/2;
+    p.y=GROUND;p.vx=0;p.vy=0;p.attacking=false;p.attackTimer=0;p.hitTimer=0;
+  });
+  particles.length=0;
+  document.getElementById('msg').textContent='🥊 敵キャラを盗んで自分の基地へ！';
+  updateUI();
+}
+
+function updateUI(){
+  if(!players[0]||!players[1])return;
+  document.getElementById('hp1-bar').style.width=(players[0].hp/players[0].maxHp*100)+'%';
+  document.getElementById('hp2-bar').style.width=(players[1].hp/players[1].maxHp*100)+'%';
+  document.getElementById('score-text').textContent=score[1]+' - '+score[0];
+}
+
+function drawMutAura(p){
+  if(!p.mutId)return;
+  var m=MUTATIONS[p.mutId];if(!m)return;
+  var t=Date.now()/700;
+  ctx.save();
+  ctx.globalAlpha=0.2+0.1*Math.sin(t);
+  ctx.beginPath();ctx.arc(p.x,p.y-28,24,0,Math.PI*2);
+  ctx.strokeStyle=m.color;ctx.lineWidth=2.5;ctx.stroke();
+  var ox=p.x+Math.cos(t*2.5)*24,oy=(p.y-28)+Math.sin(t*2.5)*24;
+  ctx.beginPath();ctx.arc(ox,oy,3.5,0,Math.PI*2);
+  ctx.fillStyle=m.color;ctx.fill();
+  ctx.restore();
+}
+
+function drawCharSVG(p){
+  var img=getSVGImg(p.charId);
+  var sw=48,sh=48;
+  ctx.save();
+  if(p.hitTimer>0)ctx.globalAlpha=p.hitTimer%4<2?0.3:1;
+  ctx.translate(p.x,p.y);
+  if(p.dir<0)ctx.scale(-1,1);
+  if(img){
+    ctx.drawImage(img,-sw/2,-sh,sw,sh);
+  } else {
+    ctx.beginPath();ctx.arc(0,-sh/2,20,0,Math.PI*2);
+    ctx.fillStyle=p.color;ctx.fill();
+    ctx.fillStyle='#fff';ctx.font='7px sans-serif';ctx.textAlign='center';
+    var c=CHARACTERS.find(function(x){return x.id===p.charId;});
+    ctx.fillText(c?c.name.slice(0,4):'?',0,-sh/2+4);
+  }
+  if(stealState.active&&stealState.carrier===p.idx){
+    ctx.globalAlpha=0.9;
+    ctx.font='18px sans-serif';ctx.textAlign='center';
+    ctx.fillText('📦',0,-sh-6);
+  }
+  if(p.attacking&&p.attackTimer>8){
+    ctx.beginPath();ctx.arc(p.dir*24,-sh/2,12,0,Math.PI*2);
+    ctx.strokeStyle=p.color;ctx.lineWidth=2.5;ctx.globalAlpha=0.5;ctx.stroke();
+  }
+  ctx.restore();
+  drawMutAura(p);
+  ctx.save();
+  var m=p.mutId?MUTATIONS[p.mutId]:null;
+  ctx.fillStyle=m?m.color:p.color;
+  ctx.font='bold 8px sans-serif';ctx.textAlign='center';
+  ctx.fillText((p.idx===0?'🤖':'🎮'),p.x,p.y-sh-4);
+  ctx.restore();
+}
+
+function drawBase(base,color,label,charId,isBot){
+  ctx.save();
+  ctx.fillStyle='rgba('+hexToRgb(color)+',0.08)';
+  ctx.fillRect(base.x,base.y,base.w,GROUND-base.y);
+  ctx.strokeStyle=color;ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.beginPath();
+  ctx.moveTo(base.x,GROUND);
+  ctx.lineTo(base.x,base.y);
+  ctx.lineTo(base.x+base.w,base.y);
+  ctx.lineTo(base.x+base.w,GROUND);
+  ctx.stroke();
+  ctx.beginPath();ctx.moveTo(base.x+10,base.y);ctx.lineTo(base.x+10,base.y-14);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(base.x+base.w-10,base.y);ctx.lineTo(base.x+base.w-10,base.y-14);ctx.stroke();
+  ctx.fillStyle=color;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText(label,base.x+base.w/2,base.y-17);
+  var img=charId?getSVGImg(charId):null;
+  if(img){
+    ctx.globalAlpha=0.3;
+    ctx.drawImage(img,base.x+6,base.y+4,base.w-12,base.h-10);
+    ctx.globalAlpha=1;
+  }
+  if(stealState.active&&((isBot&&stealState.carrier===1)||(!isBot&&stealState.carrier===0))){
+    ctx.globalAlpha=0.2+0.2*Math.sin(Date.now()/100);
+    ctx.fillStyle='#ffcc00';
+    ctx.fillRect(base.x,base.y,base.w,GROUND-base.y);
+    ctx.globalAlpha=1;
+  }
+  ctx.restore();
+}
+
+function hexToRgb(hex){
+  var r=parseInt(hex.slice(1,3),16);
+  var g=parseInt(hex.slice(3,5),16);
+  var b=parseInt(hex.slice(5,7),16);
+  return r+','+g+','+b;
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#0a0a18';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(255,255,255,0.22)';
+  for(var i=0;i<30;i++){var sx=(i*137+11)%W,sy=(i*53+7)%(GROUND-10);ctx.fillRect(sx,sy,1,1);}
+  ctx.fillStyle='#181830';ctx.fillRect(0,GROUND,W,H-GROUND);
+  ctx.strokeStyle='#2a2a60';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,GROUND);ctx.lineTo(W,GROUND);ctx.stroke();
+  drawBase(BASE.bot, players[0]?players[0].color:'#888','🤖基地',players[0]?players[0].charId:null,true);
+  drawBase(BASE.player,players[1]?players[1].color:'#00ffcc','🎮基地',players[1]?players[1].charId:null,false);
+  particles.forEach(function(pt){
+    ctx.save();ctx.fillStyle=pt.color;ctx.globalAlpha=pt.life/24;
+    ctx.beginPath();ctx.arc(pt.x,pt.y,3.5,0,Math.PI*2);ctx.fill();ctx.restore();
+  });
+  players.forEach(function(p){drawCharSVG(p);});
+}
+
+function loop(){
+  if(!gameRunning)return;
+  update();render();
+  animFrameId=requestAnimationFrame(loop);
+}
+
+try{initSelect();}catch(e){console.error(e);}
+</script>
+</body>
+</html>
