@@ -91,6 +91,7 @@ canvas{display:block;border-radius:8px;touch-action:none}
   </div>
   <button class="start-btn" id="start-btn" disabled>キャラを選んで開始！</button>
   <div class="note" id="save-note"></div>
+  <a href="https://g4mecreat0r.github.io/brai/" style="margin-top:8px;display:inline-block;background:var(--card);border:1.5px solid var(--accent2);color:var(--accent2);border-radius:10px;padding:8px 22px;font-size:12px;font-weight:700;text-decoration:none;font-family:'M PLUS Rounded 1c',sans-serif;">🏠 コレクターに戻る</a>
 </div>
 <div id="screen-game">
   <div class="game-ui">
@@ -541,8 +542,16 @@ function checkStart(){document.getElementById('start-btn').disabled=!(picked[0]&
 document.getElementById('start-btn').onclick=function(){if(picked[0]&&picked[1])startGame(picked[0],picked[1],pickedMut[0],pickedMut[1]);};
 function showSelect(){
   gameRunning=false;
+  if(animFrameId){cancelAnimationFrame(animFrameId);animFrameId=null;}
+  score=[0,0];
+  picked=[null,null];pickedMut=[null,null];
   document.getElementById('screen-select').style.display='flex';
   document.getElementById('screen-game').style.display='none';
+  document.getElementById('p1-preview').innerHTML='<svg viewBox="0 0 60 60"><text x="30" y="36" text-anchor="middle" font-size="26" fill="#556">?</text></svg>';
+  document.getElementById('p2-preview').innerHTML='<svg viewBox="0 0 60 60"><text x="30" y="36" text-anchor="middle" font-size="26" fill="#556">?</text></svg>';
+  document.getElementById('p1-name').textContent='未選択';
+  document.getElementById('p2-name').textContent='未選択';
+  document.getElementById('start-btn').disabled=true;
   initSelect();
 }
 
@@ -772,9 +781,9 @@ function endRound(winner,reason){
   } else {
     msg=(winner===1?'🎉 あなたの勝ち！':'💀 ボットの勝ち…')+(wname?' ('+wname.name+')':'');
   }
-  document.getElementById('msg').textContent=msg+' タップで再戦！';
-  canvas.addEventListener('click',restartRound,{once:true});
-  canvas.addEventListener('touchend',restartRound,{once:true});
+  document.getElementById('msg').textContent=msg;
+  // 少し待ってから選択画面に戻る
+  setTimeout(function(){showSelect();},2200);
 }
 
 function restartRound(){
