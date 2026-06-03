@@ -521,12 +521,9 @@ function buildGrid(pidx){
   var grid=document.getElementById(gridId);
   grid.innerHTML='';
 
-  // ボット枠はcommon/uncommon/rareのみ（プレイヤーは全レア度）
-  var BOT_ALLOWED_RARITIES=['common','uncommon','rare'];
   CHARACTERS.forEach(function(c){
     var items=ownedData[c.id]||[];
     if(!items.length)return;
-    if(pidx===0&&BOT_ALLOWED_RARITIES.indexOf(c.rarity)<0)return;
 
     // 変異なしのアイテムをまとめる
     var noMutItems=items.filter(function(it){return !it.muts||it.muts.length===0;});
@@ -580,8 +577,10 @@ function buildGrid(pidx){
 
 // muts: 選択したアイテムの変異ID配列（[]なら変異なし）
 function pickChar(pidx,charId,muts){
+  // ボット枠は変異を最大2個に制限
+  if(pidx===0&&muts&&muts.length>2)muts=muts.slice(0,2);
   picked[pidx]=charId;
-  pickedMuts[pidx]=muts||[];  // 複数変異を保持
+  pickedMuts[pidx]=muts||[];
   // 後方互換のため先頭1つをpickedMutにも入れる
   pickedMut[pidx]=muts&&muts.length>0?muts[0]:null;
 
@@ -590,7 +589,7 @@ function pickChar(pidx,charId,muts){
   if(pidx===0&&(!muts||muts.length===0)){
     var items=ownedData[charId]||[];
     var mutItem=items.find(function(it){return it.muts&&it.muts.length>0;});
-    if(mutItem){pickedMuts[0]=mutItem.muts;pickedMut[0]=mutItem.muts[0];}
+    if(mutItem){var limitedMuts=mutItem.muts.slice(0,2);pickedMuts[0]=limitedMuts;pickedMut[0]=limitedMuts[0];}
     else{var rm=MUTATION_POOL[Math.floor(Math.random()*MUTATION_POOL.length)];pickedMuts[0]=[rm];pickedMut[0]=rm;}
   }
 
