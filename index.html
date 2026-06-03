@@ -723,13 +723,12 @@ function update(){
         stealState.active=true;stealState.carrier=0;stealState.progress=0;
       }
     } else {
-      stealState.progress=Math.min(stealState.progress+0.3,100);
       var carrierPl=players[stealState.carrier];
       var targetBase=stealState.carrier===1?BASE.player:BASE.bot;
-      if(playerInBase(carrierPl,targetBase)&&stealState.progress>=100){endRound(stealState.carrier,'steal');return;}
+      // 自分の基地に戻った瞬間に勝利（プログレスバー不要）
+      if(playerInBase(carrierPl,targetBase)){endRound(stealState.carrier,'steal');return;}
       if(stealState.carrier===1){
-        document.getElementById('carry-bar').style.width=stealState.progress+'%';
-        document.getElementById('carry-label').textContent='キャラを運んでいる… 自分の基地へ！';
+        document.getElementById('carry-label').textContent='🏃 自分の基地まで走れ！';
       }
     }
   }
